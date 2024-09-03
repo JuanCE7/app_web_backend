@@ -11,10 +11,10 @@ datasource db {
 }
 
 model Project {
-  projectCode Int @id @default(autoincrement())
-  name String @unique
+  projectCode          Int      @id @default(autoincrement())
+  name        String   @unique
   description String?
-  image String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  image       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
