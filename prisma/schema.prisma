@@ -1,20 +1,110 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
 model Project {
-  projectCode          Int      @id @default(autoincrement())
-  name        String   @unique
+  id          Int         @id @default(autoincrement())
+  projectCode String      @unique
+  name        String      @unique
   description String?
   image       String?
+  userId      Int         // Cambiado a Int para coincidir con User
+  user        User        @relation(fields: [userId], references: [id])
+  useCases    UseCase[]   // Corrección del nombre
+  testCases   TestCase[]  // Corrección del nombre
+  permissions Permission[] // Corrección del nombre
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+enum UserType {
+  Dev
+  Admin
+  Tester
+}
+
+model User {
+  id          Int         @id @default(autoincrement())
+  firstName   String      // Cambiado a camelCase
+  lastName    String      // Cambiado a camelCase
+  email       String      @unique
+  password    String
+  type        UserType    @default(Dev)
+  projects    Project[]   // Corrección del nombre
+  testCases   TestCase[]  // Agregado para relación bidireccional
+  permissions Permission[] // Agregado para relación bidireccional
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+model UseCase { // Corrección del nombre
+  id          Int         @id @default(autoincrement()) // Cambiado a Int
+  name        String
+  description String
+  entries     Entry[]    // Corrección del nombre
+  projectId   Int
+  project     Project    @relation(fields: [projectId], references: [id])
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+model TestCase {
+  id          Int             @id @default(autoincrement()) // Cambiado a Int
+  name        String
+  description String
+  state       TestCaseStatus
+  steps       Step[]         // Corrección del nombre
+  assignedTo  User?          @relation(fields: [userId], references: [id])
+  userId      Int?           // Cambiado a Int
+  projectId   Int
+  project     Project        @relation(fields: [projectId], references: [id])
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+}
+
+model Step {
+  id          Int      @id @default(autoincrement()) // Cambiado a Int
+  number      Int
+  description String
+  testCaseId  Int
+  testCase    TestCase @relation(fields: [testCaseId], references: [id])
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+model Permission {
+  id          Int        @id @default(autoincrement()) // Cambiado a Int
+  type        PermissionType
+  userId      Int
+  user        User      @relation(fields: [userId], references: [id])
+  projectId   Int
+  project     Project   @relation(fields: [projectId], references: [id])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Entry {
+  id          Int       @id @default(autoincrement()) // Cambiado a Int
+  name        String
+  value       String
+  useCaseId   Int
+  useCase     UseCase  @relation(fields: [useCaseId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+enum TestCaseStatus {
+  Pending
+  Executed
+}
+
+enum PermissionType {
+  Reading
+  Writing
+  Viewing
 }
