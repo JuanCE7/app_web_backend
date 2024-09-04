@@ -28,40 +28,40 @@ export class ProjectsService {
     return this.prismaService.project.findMany()
   }
 
-  async findOne(projectCode: number) {
+  async findOne(id: number) {
     
     const projectFound = await this.prismaService.project.findUnique({
-      where: { projectCode : projectCode }
+      where: { id : id }
     })
     if(!projectFound){
-      throw new NotFoundException(`Project with id ${projectCode} not found`)
+      throw new NotFoundException(`Project with id ${id} not found`)
     }
 
     return projectFound
   }
 
-  async update(projectCode: number, updateProjectDto: UpdateProjectDto) {
+  async update(id: number, updateProjectDto: UpdateProjectDto) {
     const projectUpdate = await this.prismaService.project.update({
       where: {
-        projectCode :projectCode
+        id :id
       },
       data: updateProjectDto
     })
 
     if(!projectUpdate){
-      throw new NotFoundException(`Project with id ${projectCode} not found`)
+      throw new NotFoundException(`Project with id ${id} not found`)
     }
     
     return projectUpdate
   }
 
-  async remove(projectCode: number) {
+  async remove(id: number) {
     const deletedProject = await this.prismaService.project.delete({
-      where: { projectCode : projectCode }
+      where: { id : id }
     })
 
     if(!deletedProject){
-      throw new NotFoundException(`Project with id ${projectCode} not found`)
+      throw new NotFoundException(`Project with id ${id} not found`)
     }
 
     return deletedProject
