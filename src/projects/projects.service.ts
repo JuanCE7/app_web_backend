@@ -10,24 +10,13 @@ export class ProjectsService {
   constructor (private prismaService: PrismaService) { 
   }
 
-  async checkConnection() {
-    try {
-      await this.prismaService.$executeRaw`SELECT 1`;
-      console.log('Database connection is working.');
-    } catch (error) {
-      console.error('Database connection failed:', error);
-    }
-  }
-
   async create(createProjectDto: CreateProjectDto) {
     try{
-      this.checkConnection()
       return await this.prismaService.project.create({
         data: createProjectDto
       })
     }catch(error){
       console.log(error)
-      this.checkConnection()
       if(error instanceof Prisma.PrismaClientKnownRequestError){
         if(error.code == "P2002"){
           throw new ConflictException(`Project with name ${createProjectDto.name} already exists`)

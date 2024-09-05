@@ -1,26 +1,70 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { CreateStepDto } from './dto/create-step.dto';
 import { UpdateStepDto } from './dto/update-step.dto';
+import {PrismaService} from 'src/prisma/prisma.service'
+import {Prisma} from '@prisma/client'
 
 @Injectable()
 export class StepsService {
-  create(createStepDto: CreateStepDto) {
-    return 'This action adds a new step';
+
+  constructor (private prismaService: PrismaService) { 
+  }
+
+  async create(createStepDto: CreateStepDto) {
+    try {
+      return await this.prismaService.step.create({
+        data: createStepDto
+      })
+    } catch (error) {
+      console.log(error)
+      if(error instanceof Prisma.PrismaClientKnownRequestError){
+        if(error.code == "P2002"){
+          throw new ConflictException(`Step with use case ${createStepDto.testCaseId} already exists`)
+        }
+      }
+    }
   }
 
   findAll() {
-    return `This action returns all steps`;
+    return this.prismaService.step.findMany()
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} step`;
+  async findOne(id: number) {
+    
+    const stepFound = await this.prismaService.step.findUnique({
+      where: { id : id }
+    })
+    if(!stepFound){
+      throw new NotFoundException(`Step with id ${id} not found`)
+    }
+
+    return stepFound
   }
 
-  update(id: number, updateStepDto: UpdateStepDto) {
-    return `This action updates a #${id} step`;
+  async update(id: number, updateStepDto: UpdateStepDto) {
+    const permissionUpdate = await this.prismaService.step.update({
+      where: {
+        id :id
+      },
+      data: updateStepDto
+    })
+
+    if(!permissionUpdate){
+      throw new NotFoundException(`Step with id ${id} not found`)
+    }
+    
+    return permissionUpdate
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} step`;
+  async remove(id: number) {
+    const deletedStep = await this.prismaService.step.delete({
+      where: { id : id }
+    })
+
+    if(!deletedStep){
+      throw new NotFoundException(`Step with id ${id} not found`)
+    }
+
+    return deletedStep
   }
 }
