@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { CreateUsecaseDto } from './dto/create-usecase.dto';
-import { UpdateUsecaseDto } from './dto/update-usecase.dto';
+import { CreateUseCaseDto } from './dto/create-usecase.dto';
+import { UpdateUseCaseDto } from './dto/update-usecase.dto';
 
 @Injectable()
 export class UsecasesService {
-  create(createUsecaseDto: CreateUsecaseDto) {
+  create(createUsecaseDto: CreateUseCaseDto) {
     return 'This action adds a new usecase';
   }
 
@@ -16,7 +16,7 @@ export class UsecasesService {
     return `This action returns a #${id} usecase`;
   }
 
-  update(id: number, updateUsecaseDto: UpdateUsecaseDto) {
+  update(id: number, updateUsecaseDto: UpdateUseCaseDto) {
     return `This action updates a #${id} usecase`;
   }
 

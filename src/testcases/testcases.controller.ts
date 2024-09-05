@@ -1,15 +1,15 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { TestcasesService } from './testcases.service';
-import { CreateTestcaseDto } from './dto/create-testcase.dto';
-import { UpdateTestcaseDto } from './dto/update-testcase.dto';
+import { CreateTestCaseDto } from './dto/create-testcase.dto';
+import { UpdateTestCaseDto } from './dto/update-testcase.dto';
 
 @Controller('testcases')
 export class TestcasesController {
   constructor(private readonly testcasesService: TestcasesService) {}
 
   @Post()
-  create(@Body() createTestcaseDto: CreateTestcaseDto) {
-    return this.testcasesService.create(createTestcaseDto);
+  create(@Body() CreateTestCaseDto: CreateTestCaseDto) {
+    return this.testcasesService.create(CreateTestCaseDto);
   }
 
   @Get()
@@ -23,8 +23,8 @@ export class TestcasesController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateTestcaseDto: UpdateTestcaseDto) {
-    return this.testcasesService.update(+id, updateTestcaseDto);
+  update(@Param('id') id: string, @Body() UpdateTestCaseDto: UpdateTestCaseDto) {
+    return this.testcasesService.update(+id, UpdateTestCaseDto);
   }
 
   @Delete(':id')
