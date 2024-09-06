@@ -42,18 +42,18 @@ export class StepsService {
   }
 
   async update(id: number, updateStepDto: UpdateStepDto) {
-    const permissionUpdate = await this.prismaService.step.update({
+    const stepUpdate = await this.prismaService.step.update({
       where: {
         id :id
       },
       data: updateStepDto
     })
 
-    if(!permissionUpdate){
+    if(!stepUpdate){
       throw new NotFoundException(`Step with id ${id} not found`)
     }
     
-    return permissionUpdate
+    return stepUpdate
   }
 
   async remove(id: number) {
