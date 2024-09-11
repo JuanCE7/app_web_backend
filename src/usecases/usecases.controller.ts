@@ -27,20 +27,20 @@ export class UsecasesController {
   @ApiOperation({ summary : 'Get a usecase'})
   @ApiResponse({status: 200, description : 'A usecase has been successfully returned'})
   findOne(@Param('id') id: string) {
-    return this.usecasesService.findOne(+id);
+    return this.usecasesService.findOne(id);
   }
 
   @Patch(':id')
   @ApiOperation({ summary : 'Update a usecase'})
   @ApiResponse({status: 200, description : 'A usecase has been successfully updated'})
   update(@Param('id') id: string, @Body() UpdateUseCaseDto: UpdateUseCaseDto) {
-    return this.usecasesService.update(+id, UpdateUseCaseDto);
+    return this.usecasesService.update(id, UpdateUseCaseDto);
   }
 
   @Delete(':id')
   @ApiOperation({ summary : 'Delete a usecase'})
   @ApiResponse({status: 200, description : 'A usecase has been successfully deleted '})
   remove(@Param('id') id: string) {
-    return this.usecasesService.remove(+id);
+    return this.usecasesService.remove(id);
   }
 }

@@ -27,7 +27,7 @@ export class UsecasesService {
     return this.prismaService.useCase.findMany()
   }
 
-  async findOne(id: number) {
+  async findOne(id: string) {
     
     const useCaseFound = await this.prismaService.useCase.findUnique({
       where: { id : id }
@@ -39,7 +39,7 @@ export class UsecasesService {
     return useCaseFound
   }
 
-  async update(id: number, updateUsecaseDto: UpdateUseCaseDto) {
+  async update(id: string, updateUsecaseDto: UpdateUseCaseDto) {
     const useCaseUpdate = await this.prismaService.useCase.update({
       where: {
         id :id
@@ -54,7 +54,7 @@ export class UsecasesService {
     return useCaseUpdate
   }
 
-  async remove(id: number) {
+  async remove(id: string) {
     const deletedUseCase = await this.prismaService.useCase.delete({
       where: { id : id }
     })

@@ -1,69 +1,123 @@
-import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+} from '@nestjs/common';
+import { CreateUserDto } from './dto/create-user.dto'; // Asegúrate de tener los DTOs definidos
 import { UpdateUserDto } from './dto/update-user.dto';
-import {PrismaService} from 'src/prisma/prisma.service'
-import {Prisma} from '@prisma/client'
+import * as bcrypt from 'bcryptjs';
+import { Prisma } from '@prisma/client';
+import { PrismaService } from 'src/prisma/prisma.service';
+
 @Injectable()
 export class UsersService {
+  constructor(private prisma: PrismaService) {}
 
-  constructor (private prismaService: PrismaService) { 
-  }
+  async createUser(createUserDto: CreateUserDto) {
+    // Encriptar la contraseña y crear un nuevo objeto con la contraseña encriptada
+    const { password, ...userData } = createUserDto;
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-  async create(createUserDto: CreateUserDto) {
     try {
-      return await this.prismaService.user.create({
-        data: createUserDto
-      })
+      const newUser = await this.prisma.user.create({
+        data: {
+          ...userData,
+          password: hashedPassword,
+        },
+      });
+      return { user: newUser };
     } catch (error) {
-      console.log(error)
-      if(error instanceof Prisma.PrismaClientKnownRequestError){
-        if(error.code == "P2002"){
-          throw new ConflictException(`User with email ${createUserDto.email} already exists`)
-        }
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2002'
+      ) {
+        throw new ConflictException('Email already exists');
       }
+      throw error;
     }
   }
 
-  findAll() {
-    return this.prismaService.user.findMany()
-  }
-
-  async findOne(id: number) {
-    
-    const userFound = await this.prismaService.user.findUnique({
-      where: { id : id }
-    })
-    if(!userFound){
-      throw new NotFoundException(`User with id ${id} not found`)
-    }
-
-    return userFound
-  }
-
-  async update(id: number, updateUserDto: UpdateUserDto) {
-    const userUpdate = await this.prismaService.user.update({
-      where: {
-        id :id
+  // Obtener todos los usuarios
+  async getUsers() {
+    return this.prisma.user.findMany({
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        userType: true,
       },
-      data: updateUserDto
-    })
-
-    if(!userUpdate){
-      throw new NotFoundException(`User with id ${id} not found`)
-    }
-    
-    return userUpdate
+    });
   }
 
-  async remove(id: number) {
-    const deletedUser = await this.prismaService.user.delete({
-      where: { id : id }
-    })
-
-    if(!deletedUser){
-      throw new NotFoundException(`User with id ${id} not found`)
+  // Obtener un usuario por id
+  async getUserById(id: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+      select: {
+        email: true,
+        firstName: true,
+        lastName: true,
+        userType: true,
+      }, 
+    });
+    if (!user) {
+      throw new NotFoundException(`User with id ${id} not found`);
     }
+    return { user };
+  }
 
-    return deletedUser
+  // Actualizar usuario
+  async updateUser(id: string, updateUserDto: UpdateUserDto) {
+    const { password, ...userData } = updateUserDto;
+    const hashedPassword = password
+      ? await bcrypt.hash(password, 10)
+      : undefined;
+
+    try {
+      const updatedUser = await this.prisma.user.update({
+        where: { id },
+        data: {
+          ...userData,
+          password: hashedPassword || undefined,
+        },
+      });
+      return { user: updatedUser };
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2025'
+      ) {
+        throw new NotFoundException(`User with id ${id} not found`);
+      }
+      throw error;
+    }
+  }
+
+  // Eliminar usuario
+  async deleteUser(id: string) {
+    try {
+      await this.prisma.user.delete({ where: { id } });
+      return { message: `User with id ${id} deleted successfully` };
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2025'
+      ) {
+        throw new NotFoundException(`User with id ${id} not found`);
+      }
+      throw error;
+    }
+  }
+
+  // Método para encontrar un usuario por email
+  async findByEmail(email: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { email },
+    });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return user;
   }
 }

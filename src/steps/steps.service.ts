@@ -29,7 +29,7 @@ export class StepsService {
     return this.prismaService.step.findMany()
   }
 
-  async findOne(id: number) {
+  async findOne(id: string) {
     
     const stepFound = await this.prismaService.step.findUnique({
       where: { id : id }
@@ -41,7 +41,7 @@ export class StepsService {
     return stepFound
   }
 
-  async update(id: number, updateStepDto: UpdateStepDto) {
+  async update(id: string, updateStepDto: UpdateStepDto) {
     const stepUpdate = await this.prismaService.step.update({
       where: {
         id :id
@@ -56,7 +56,7 @@ export class StepsService {
     return stepUpdate
   }
 
-  async remove(id: number) {
+  async remove(id: string) {
     const deletedStep = await this.prismaService.step.delete({
       where: { id : id }
     })

@@ -29,7 +29,7 @@ export class ProjectsService {
     return this.prismaService.project.findMany()
   }
 
-  async findOne(id: number) {
+  async findOne(id: string) {
     
     const projectFound = await this.prismaService.project.findUnique({
       where: { id : id }
@@ -41,7 +41,7 @@ export class ProjectsService {
     return projectFound
   }
 
-  async update(id: number, updateProjectDto: UpdateProjectDto) {
+  async update(id: string, updateProjectDto: UpdateProjectDto) {
     const projectUpdate = await this.prismaService.project.update({
       where: {
         id :id
@@ -56,7 +56,7 @@ export class ProjectsService {
     return projectUpdate
   }
 
-  async remove(id: number) {
+  async remove(id: string) {
     const deletedProject = await this.prismaService.project.delete({
       where: { id : id }
     })

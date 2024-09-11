@@ -27,20 +27,20 @@ export class StepsController {
   @ApiOperation({ summary : 'Get a step'})
   @ApiResponse({status: 200, description : 'A step has been successfully returned'})
   findOne(@Param('id') id: string) {
-    return this.stepsService.findOne(+id);
+    return this.stepsService.findOne(id);
   }
 
   @Patch(':id')
   @ApiOperation({ summary : 'Update a step'})
   @ApiResponse({status: 200, description : 'A step has been successfully updated'})
   update(@Param('id') id: string, @Body() updateStepDto: UpdateStepDto) {
-    return this.stepsService.update(+id, updateStepDto);
+    return this.stepsService.update(id, updateStepDto);
   }
 
   @Delete(':id')
   @ApiOperation({ summary : 'Delete a step'})
   @ApiResponse({status: 200, description : 'A step has been successfully deleted '})
   remove(@Param('id') id: string) {
-    return this.stepsService.remove(+id);
+    return this.stepsService.remove(id);
   }
 }

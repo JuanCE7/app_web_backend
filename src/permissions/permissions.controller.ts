@@ -27,20 +27,20 @@ export class PermissionsController {
   @ApiOperation({ summary : 'Get a permission'})
   @ApiResponse({status: 200, description : 'A permission has been successfully returned'})
   findOne(@Param('id') id: string) {
-    return this.permissionsService.findOne(+id);
+    return this.permissionsService.findOne(id);
   }
 
   @Patch(':id')
   @ApiOperation({ summary : 'Update a permission'})
   @ApiResponse({status: 200, description : 'A permission has been successfully updated'})
   update(@Param('id') id: string, @Body() updatePermissionDto: UpdatePermissionDto) {
-    return this.permissionsService.update(+id, updatePermissionDto);
+    return this.permissionsService.update(id, updatePermissionDto);
   }
 
   @Delete(':id')
   @ApiOperation({ summary : 'Delete a permission'})
   @ApiResponse({status: 200, description : 'A permission has been successfully deleted '})
   remove(@Param('id') id: string) {
-    return this.permissionsService.remove(+id);
+    return this.permissionsService.remove(id);
   }
 }

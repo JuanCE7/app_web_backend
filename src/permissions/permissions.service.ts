@@ -29,7 +29,7 @@ export class PermissionsService {
     return this.prismaService.permission.findMany()
   }
 
-  async findOne(id: number) {
+  async findOne(id: string) {
     
     const permissionFound = await this.prismaService.permission.findUnique({
       where: { id : id }
@@ -42,7 +42,7 @@ export class PermissionsService {
   }
 
 
-  async update(id: number, updatePermissionDto: UpdatePermissionDto) {
+  async update(id: string, updatePermissionDto: UpdatePermissionDto) {
     const permissionUpdate = await this.prismaService.permission.update({
       where: {
         id :id
@@ -57,7 +57,7 @@ export class PermissionsService {
     return permissionUpdate
   }
 
-  async remove(id: number) {
+  async remove(id: string) {
     const deletedPermission = await this.prismaService.permission.delete({
       where: { id : id }
     })

@@ -27,19 +27,19 @@ export class TestcasesController {
   @ApiOperation({ summary : 'Get a testcase'})
   @ApiResponse({status: 200, description : 'A testcase has been successfully returned'})
   findOne(@Param('id') id: string) {
-    return this.testcasesService.findOne(+id);
+    return this.testcasesService.findOne(id);
   }
 
   @Patch(':id')
   @ApiOperation({ summary : 'Update a testcase'})
   @ApiResponse({status: 200, description : 'A testcase has been successfully updated'})
   update(@Param('id') id: string, @Body() UpdateTestCaseDto: UpdateTestCaseDto) {
-    return this.testcasesService.update(+id, UpdateTestCaseDto);
+    return this.testcasesService.update(id, UpdateTestCaseDto);
   }
 
   @Delete(':id')
   @ApiOperation({ summary : 'Delete a testcase'})
   @ApiResponse({status: 200, description : 'A testcase has been successfully deleted '})  remove(@Param('id') id: string) {
-    return this.testcasesService.remove(+id);
+    return this.testcasesService.remove(id);
   }
 }

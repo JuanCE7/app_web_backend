@@ -14,7 +14,7 @@ enum UserType {
 }
 
 model User {
-  id          Int      @id @default(autoincrement())
+  id          String      @id @default(uuid())
   firstName   String  
   lastName    String
   email       String @unique
@@ -27,12 +27,12 @@ model User {
 }
 
 model Project {
-  id          Int      @id @default(autoincrement())
+  id          String      @id @default(uuid())
   projectCode String   @unique
   name        String
   description String?
   image       String?
-  creatorId   Int      // ID del creador del proyecto
+  creatorId   String      // ID del creador del proyecto
   creator     User     @relation(fields: [creatorId], references: [id]) // Relación con el usuario creador
   useCases    UseCase[]     // Relación uno a muchos con CasoDeUso
   testCases   TestCase[]    // Relación uno a muchos con CasoDePrueba
@@ -42,7 +42,7 @@ model Project {
 }
 
 model UseCase {
-  id              Int      @id @default(autoincrement()) // ID interno
+  id              String      @id @default(uuid()) // ID interno
   displayId       String   @unique // ID de visualización
   name            String   // Breve título que describe el caso de uso
   description     String   // Detalle del propósito del caso de uso y su comportamiento esperado
@@ -51,7 +51,7 @@ model UseCase {
   postconditions  String[] // Resultado esperado después de ejecutar el caso de uso
   mainFlow        String[] // Pasos clave que describe el flujo principal del caso de uso
   alternateFlows  String[] // Flujos alternativos que se desvían del flujo principal
-  projectId       Int
+  projectId       String
   project         Project  @relation(fields: [projectId], references: [id])
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
@@ -59,35 +59,35 @@ model UseCase {
 
 
 model TestCase {
-  id            Int        @id @default(autoincrement()) // ID interno
+  id            String        @id @default(uuid()) // ID interno
   displayId     String     @unique // ID de visualización
   name          String     // Nombre descriptivo basado en el caso de uso
   description   String     // Explicación del objetivo del caso de prueba
   steps         Step[]     // Listado de pasos didácticos para obtener el caso de prueba
   inputData     String[]   // Datos de entrada usados en la prueba (basado en entradas del caso de uso)
   expectedResult String?   // Lo que se espera que el sistema devuelva o realice
-  projectId     Int
+  projectId     String
   project       Project    @relation(fields: [projectId], references: [id])
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 }
 
 model Step {
-  id          Int  @id @default(autoincrement())
+  id          String  @id @default(uuid())
   number      Int
   description String
-  testCaseId  Int
+  testCaseId  String
   testCase    TestCase @relation(fields: [testCaseId], references: [id])
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
 
 model Permission {
-  id            Int       @id @default(autoincrement())
+  id            String       @id @default(uuid())
   permissionType PermissionType
-  userId        Int
+  userId        String
   user          User      @relation(fields: [userId], references: [id])
-  projectId     Int
+  projectId     String
   project       Project   @relation(fields: [projectId], references: [id])
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt

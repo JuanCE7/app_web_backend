@@ -1,0 +1,14 @@
+version: "3.8"
+services:
+  postgres:
+    image: postgres:16
+    container_name: postgres_db
+    restart: always
+    environment:
+      POSTGRES_DB: db_app_web
+      POSTGRES_USER: jfcastillo
+      POSTGRES_PASSWORD: 12345
+    volumes:
+      - ./postgres:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"

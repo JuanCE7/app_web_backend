@@ -28,7 +28,7 @@ export class TestcasesService {
     return this.prismaService.testCase.findMany()
   }
 
-  async findOne(id: number) {
+  async findOne(id: string) {
     
     const testCaseFound = await this.prismaService.testCase.findUnique({
       where: { id : id }
@@ -40,7 +40,7 @@ export class TestcasesService {
     return testCaseFound
   }
 
-  async update(id: number, updateTestcaseDto: UpdateTestCaseDto) {
+  async update(id: string, updateTestcaseDto: UpdateTestCaseDto) {
     const testCaseUpdate = await this.prismaService.testCase.update({
       where: {
         id :id
@@ -55,7 +55,7 @@ export class TestcasesService {
     return testCaseUpdate
   }
 
-  async remove(id: number) {
+  async remove(id: string) {
     const deletedTestCase = await this.prismaService.testCase.delete({
       where: { id : id }
     })

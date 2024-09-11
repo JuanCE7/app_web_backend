@@ -9,11 +9,12 @@ CREATE TYPE "PermissionType" AS ENUM ('Reading', 'Writing', 'Both');
 
 -- CreateTable
 CREATE TABLE "User" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
     "firstName" TEXT NOT NULL,
     "lastName" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
+    "hashedPassword" TEXT NOT NULL,
     "userType" "UserType" NOT NULL DEFAULT 'Dev',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -23,12 +24,12 @@ CREATE TABLE "User" (
 
 -- CreateTable
 CREATE TABLE "Project" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
     "projectCode" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "description" TEXT,
     "image" TEXT,
-    "creatorId" INTEGER NOT NULL,
+    "creatorId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -37,7 +38,7 @@ CREATE TABLE "Project" (
 
 -- CreateTable
 CREATE TABLE "UseCase" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
     "displayId" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "description" TEXT NOT NULL,
@@ -46,7 +47,7 @@ CREATE TABLE "UseCase" (
     "postconditions" TEXT[],
     "mainFlow" TEXT[],
     "alternateFlows" TEXT[],
-    "projectId" INTEGER NOT NULL,
+    "projectId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -55,13 +56,13 @@ CREATE TABLE "UseCase" (
 
 -- CreateTable
 CREATE TABLE "TestCase" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
     "displayId" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "description" TEXT NOT NULL,
     "inputData" TEXT[],
     "expectedResult" TEXT,
-    "projectId" INTEGER NOT NULL,
+    "projectId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -70,10 +71,10 @@ CREATE TABLE "TestCase" (
 
 -- CreateTable
 CREATE TABLE "Step" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
     "number" INTEGER NOT NULL,
     "description" TEXT NOT NULL,
-    "testCaseId" INTEGER NOT NULL,
+    "testCaseId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -82,10 +83,10 @@ CREATE TABLE "Step" (
 
 -- CreateTable
 CREATE TABLE "Permission" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
     "permissionType" "PermissionType" NOT NULL,
-    "userId" INTEGER NOT NULL,
-    "projectId" INTEGER NOT NULL,
+    "userId" TEXT NOT NULL,
+    "projectId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
