@@ -1,4 +1,4 @@
-import { UserType } from '@prisma/client';
+import { Roles } from '@prisma/client';
 import { Transform } from 'class-transformer';
 import { IsEmail, IsString, MinLength,IsEnum } from 'class-validator';
 
@@ -19,6 +19,6 @@ export class CreateUserDto {
   @MinLength(6)
   password: string;
 
-  @IsEnum(UserType)
-  userType: UserType;
+  @IsEnum(Roles)
+  role: Roles;
 }

@@ -9,19 +9,16 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
-  @Roles('Admin', 'Dev', 'Tester') 
   async create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.createUser(createUserDto);
   }
 
   @Get()
-  @Roles('Admin', 'Dev', 'Tester') // Admin y Dev pueden ver todos los usuarios
   async findAll() {
     return this.usersService.getUsers();
   }
 
   @Get(':id')
-  @Roles('Admin', 'Dev', 'Tester') // Todos los roles pueden ver usuarios específicos
   async findOne(@Param('id') id: string) {
     return this.usersService.getUserById(id);
   }

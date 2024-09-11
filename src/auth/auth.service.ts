@@ -21,7 +21,7 @@ export class AuthService {
     lastName,
     email,
     password,
-    userType,
+    role,
   }: CreateUserDto) {
     const user = await this.usersService.findByEmail(email);
 
@@ -34,12 +34,14 @@ export class AuthService {
       lastName,
       email,
       password: await bcrypt.hash(password, 10),
-      userType,
+      role,
     });
 
     return {
-      name,
+      firstName,
+      lastName,
       email,
+      role,
     };
   }
 
@@ -54,16 +56,17 @@ export class AuthService {
       throw new UnauthorizedException('password is wrong');
     }
 
-    const payload = { email: user.email, role: user.userType };
+    const payload = { email: user.email, role: user.role };
     const token = await this.jwtService.signAsync(payload);
 
     return {
       token,
       email,
+      role: user.role,
     };
   }
 
-  async profile({ email, userType }: { email: string; userType: string }) {
+  async profile({ email, role }: { email: string; role: string }) {
     return await this.usersService.findByEmail(email);
   }
 }

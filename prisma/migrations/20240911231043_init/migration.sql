@@ -1,5 +1,5 @@
 -- CreateEnum
-CREATE TYPE "UserType" AS ENUM ('Dev', 'Admin', 'Tester');
+CREATE TYPE "Roles" AS ENUM ('Dev', 'Admin', 'Tester');
 
 -- CreateEnum
 CREATE TYPE "TestCaseState" AS ENUM ('Pending', 'Executed');
@@ -14,8 +14,7 @@ CREATE TABLE "User" (
     "lastName" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
-    "hashedPassword" TEXT NOT NULL,
-    "userType" "UserType" NOT NULL DEFAULT 'Dev',
+    "role" "Roles" NOT NULL DEFAULT 'Dev',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 

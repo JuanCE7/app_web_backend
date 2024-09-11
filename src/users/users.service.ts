@@ -45,7 +45,7 @@ export class UsersService {
         email: true,
         firstName: true,
         lastName: true,
-        userType: true,
+        role: true,
       },
     });
   }
@@ -58,7 +58,7 @@ export class UsersService {
         email: true,
         firstName: true,
         lastName: true,
-        userType: true,
+        role: true,
       }, 
     });
     if (!user) {

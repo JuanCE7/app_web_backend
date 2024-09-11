@@ -7,7 +7,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum UserType {
+enum Roles {
   Dev
   Admin
   Tester
@@ -19,7 +19,7 @@ model User {
   lastName    String
   email       String @unique
   password    String
-  userType    UserType @default(Dev) 
+  role        Roles @default(Dev) 
   projects    Project[] // Relación uno a muchos con Proyecto (proyectos creados por el usuario)
   permissions Permission[] // Proyectos a los que tiene acceso con permisos
   createdAt   DateTime @default(now())

@@ -3,11 +3,11 @@ import { AuthService } from './auth.service';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { LoginDto } from './dto/user-login.dto';
 import { Request } from 'express';
-import { UserType } from '@prisma/client';
+import { Roles  } from '@prisma/client';
 import { Auth } from './decorators/auth.decorator';
 
 interface RequestWithUser extends Request {
-  user: { email: string; userType: string };
+  user: { email: string; role: string };
 }
 
 @Controller('auth')
@@ -31,11 +31,11 @@ export class AuthController {
   }
 
   @Get('profile')
-  @Auth(UserType.Dev) 
+  @Auth("Dev") 
   profile(@Req() req: RequestWithUser) {
     return this.authService.profile({
       email: req.user.email,
-      userType: req.user.userType,
+      role: req.user.role,
     })
   }
 }
