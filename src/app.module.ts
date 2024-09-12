@@ -7,6 +7,7 @@ import { StepsModule } from './steps/steps.module';
 import { PermissionsModule } from './permissions/permissions.module';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
+import { IaModule } from './ia/ia.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { UsersModule } from './users/users.module';
     PermissionsModule,
     AuthModule,
     UsersModule,
+    IaModule,
   ],
   controllers: [],
   providers: [PrismaService],
