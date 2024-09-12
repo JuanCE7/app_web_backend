@@ -27,6 +27,6 @@ export class IaService {
       ),
     );
 
-    return response.data; // Retorna la respuesta de la API
+    return response.data;
   }
 }

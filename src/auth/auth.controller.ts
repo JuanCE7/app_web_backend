@@ -3,7 +3,6 @@ import { AuthService } from './auth.service';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { LoginDto } from './dto/user-login.dto';
 import { Request } from 'express';
-import { Roles  } from '@prisma/client';
 import { Auth } from './decorators/auth.decorator';
 
 interface RequestWithUser extends Request {
