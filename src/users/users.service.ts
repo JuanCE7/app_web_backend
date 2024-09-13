@@ -59,7 +59,7 @@ export class UsersService {
         firstName: true,
         lastName: true,
         role: true,
-      }, 
+      },
     });
     if (!user) {
       throw new NotFoundException(`User with id ${id} not found`);

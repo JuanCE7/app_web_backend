@@ -11,6 +11,6 @@ export class IaController {
       throw new Error('Prompt is required');
     }
     const response = await this.iaService.getCompletion(prompt);
-    return response.choices[0].text; // Devuelve solo el texto de la primera opción
+    return response.choices[0].text;
   }
 }

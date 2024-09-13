@@ -18,7 +18,7 @@ export class TestcasesController {
 
   @Get()
   @ApiOperation({ summary : 'Get testcases'})
-  @ApiResponse({status: 200, description : 'The testcases haS been successfully returned'})
+  @ApiResponse({status: 200, description : 'The testcases has been successfully returned'})
   findAll() {
     return this.testcasesService.findAll();
   }

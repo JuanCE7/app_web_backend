@@ -12,10 +12,13 @@ export class IaService {
 
     const response = await lastValueFrom(
       this.httpService.post(
-        'https://api.openai.com/v1/completions',
+        'https://api.openai.com/v1/chat/completions',
         {
-          model: 'text-davinci-003',
-          prompt: prompt,
+          model: 'gpt-3.5-turbo',
+          messages: [
+            { role: 'system', content: 'You are a helpful assistant.' }, // Contexto del sistema (opcional)
+            { role: 'user', content: prompt }, // El prompt se pasa en el rol de 'user'
+          ],
           max_tokens: 20,
         },
         {

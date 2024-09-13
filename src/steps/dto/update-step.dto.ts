@@ -1,3 +1,4 @@
+import { PartialType } from '@nestjs/mapped-types';
 import { CreateStepDto } from './create-step.dto';
 
-export type UpdateStepDto = Partial<CreateStepDto>
+export class UpdateStepDto extends PartialType(CreateStepDto) {}

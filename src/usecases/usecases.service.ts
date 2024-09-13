@@ -22,7 +22,7 @@ export class UsecasesService {
       }
     }
   }
-
+ 
   findAll() {
     return this.prismaService.useCase.findMany()
   }
