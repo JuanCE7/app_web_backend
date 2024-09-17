@@ -1,35 +1,30 @@
 import { Injectable } from '@nestjs/common';
-import { HttpService } from '@nestjs/axios';
-import { lastValueFrom } from 'rxjs';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 @Injectable()
 export class IaService {
-  constructor(private readonly httpService: HttpService) {}
+  private genAI: GoogleGenerativeAI;
+  private model: any;
 
-  // Método que realiza la solicitud a la API de OpenAI
-  async getCompletion(prompt: string): Promise<any> {
-    const API_KEY = process.env.OPENAI_API_KEY; // Usa la API Key desde las variables de entorno
+  constructor() {
+    // Inicializa el cliente de Google Generative AI con la API Key directamente como string
+    this.genAI = new GoogleGenerativeAI(process.env.GOOGLE_GENAI_API_KEY); // Pasa la API Key directamente
 
-    const response = await lastValueFrom(
-      this.httpService.post(
-        'https://api.openai.com/v1/chat/completions',
-        {
-          model: 'gpt-3.5-turbo',
-          messages: [
-            { role: 'system', content: 'You are a helpful assistant.' }, // Contexto del sistema (opcional)
-            { role: 'user', content: prompt }, // El prompt se pasa en el rol de 'user'
-          ],
-          max_tokens: 20,
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${API_KEY}`,
-          },
-        },
-      ),
-    );
+    // Selecciona el modelo generativo a utilizar
+    this.model = this.genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+  }
 
-    return response.data;
+  // Método que realiza la solicitud a la API de Google Generative AI
+  async getCompletion(prompt: string): Promise<string> {
+    try {
+      // Genera contenido con el modelo utilizando el prompt proporcionado
+      const result = await this.model.generateContent(prompt);
+
+      // Retorna el contenido de la respuesta
+      return result.response.text();
+    } catch (error) {
+      console.error('Error en getCompletion:', error);
+      throw new Error('No se pudo obtener una respuesta de la API de Google Generative AI');
+    }
   }
 }
