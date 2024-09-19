@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { GoogleGenerativeAI } from '@google/generative-ai';
-
+import {prompt as pt} from '../utils/constants'
 @Injectable()
 export class IaService {
   private genAI: GoogleGenerativeAI;
@@ -18,10 +18,11 @@ export class IaService {
   async getCompletion(prompt: string): Promise<string> {
     try {
       // Genera contenido con el modelo utilizando el prompt proporcionado
-      const result = await this.model.generateContent(prompt);
+      var entry = pt + prompt
+      const result = await this.model.generateContent(entry);
 
-      // Retorna el contenido de la respuesta
-      return result.response.text();
+      // Retorna el contenido de la respues ta
+      return result.response.candidates[0].content.parts[0];
     } catch (error) {
       console.error('Error en getCompletion:', error);
       throw new Error('No se pudo obtener una respuesta de la API de Google Generative AI');
