@@ -13,6 +13,7 @@ export class CreateProjectDto {
   description?: string; // Descripción opcional del proyecto
 
   @IsUrl()
+  @IsOptional()
   image?: string; // Imagen del proyecto
 
   @IsUUID()

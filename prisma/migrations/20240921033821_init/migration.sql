@@ -2,6 +2,9 @@
 CREATE TYPE "Roles" AS ENUM ('Dev', 'Admin', 'Tester');
 
 -- CreateEnum
+CREATE TYPE "TipoAnalisis" AS ENUM ('Descripcion', 'Precondiciones', 'Pasos', 'DatosDeEntrada', 'ResultadoEsperado');
+
+-- CreateEnum
 CREATE TYPE "TestCaseState" AS ENUM ('Pending', 'Executed');
 
 -- CreateEnum
@@ -81,6 +84,20 @@ CREATE TABLE "Step" (
 );
 
 -- CreateTable
+CREATE TABLE "SecuenciaAnalisis" (
+    "id" TEXT NOT NULL,
+    "textoAnalizado" TEXT NOT NULL,
+    "palabrasClave" TEXT[],
+    "explicacion" TEXT NOT NULL,
+    "tipo" "TipoAnalisis" NOT NULL,
+    "testCaseId" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "SecuenciaAnalisis_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "Permission" (
     "id" TEXT NOT NULL,
     "permissionType" "PermissionType" NOT NULL,
@@ -115,6 +132,9 @@ ALTER TABLE "TestCase" ADD CONSTRAINT "TestCase_projectId_fkey" FOREIGN KEY ("pr
 
 -- AddForeignKey
 ALTER TABLE "Step" ADD CONSTRAINT "Step_testCaseId_fkey" FOREIGN KEY ("testCaseId") REFERENCES "TestCase"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "SecuenciaAnalisis" ADD CONSTRAINT "SecuenciaAnalisis_testCaseId_fkey" FOREIGN KEY ("testCaseId") REFERENCES "TestCase"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Permission" ADD CONSTRAINT "Permission_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

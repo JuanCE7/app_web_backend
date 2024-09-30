@@ -60,7 +60,7 @@ model UseCase {
 
 model TestCase {
   id            String        @id @default(uuid()) // ID interno
-  displayId     String     @unique // ID de visualización
+  displayId     String     // ID de visualización
   name          String     // Nombre descriptivo basado en el caso de uso
   description   String     // Explicación del objetivo del caso de prueba
   steps         Step[]     // Listado de pasos didácticos para obtener el caso de prueba
@@ -68,6 +68,7 @@ model TestCase {
   expectedResult String?   // Lo que se espera que el sistema devuelva o realice
   projectId     String
   project       Project    @relation(fields: [projectId], references: [id])
+  secuenciaAnalisis  SecuenciaAnalisis[] // Relación con la tabla de secuencia de análisis
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 }
@@ -80,6 +81,26 @@ model Step {
   testCase    TestCase @relation(fields: [testCaseId], references: [id])
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+model SecuenciaAnalisis {
+  id                 String   @id @default(uuid())
+  textoAnalizado     String   // Texto analizado en esta parte del caso de prueba
+  palabrasClave      String[] // Palabras clave identificadas en el análisis
+  explicacion        String   // Explicación de cómo se interpreta el texto
+  tipo               TipoAnalisis // Enum para indicar la parte que se está analizando (Descripción, Precondiciones, etc.)
+  testCaseId         String
+  testCase           TestCase @relation(fields: [testCaseId], references: [id])
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}
+
+enum TipoAnalisis {
+  Descripcion
+  Precondiciones
+  Pasos
+  DatosDeEntrada
+  ResultadoEsperado
 }
 
 model Permission {

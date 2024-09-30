@@ -1,31 +1,34 @@
 import { Injectable } from '@nestjs/common';
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import {prompt as pt} from '../utils/constants'
+import { api_key, prompt as prompt } from '../utils/constants';
+import { Usecase } from 'src/usecases/entities/usecase.entity';
 @Injectable()
 export class IaService {
   private genAI: GoogleGenerativeAI;
   private model: any;
 
   constructor() {
-    // Inicializa el cliente de Google Generative AI con la API Key directamente como string
-    this.genAI = new GoogleGenerativeAI(process.env.GOOGLE_GENAI_API_KEY); // Pasa la API Key directamente
-
-    // Selecciona el modelo generativo a utilizar
+    this.genAI = new GoogleGenerativeAI(api_key);
     this.model = this.genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
   }
 
-  // Método que realiza la solicitud a la API de Google Generative AI
-  async getCompletion(prompt: string): Promise<string> {
+  async getCompletion(useCaseData: Partial<Usecase>) {
     try {
-      // Genera contenido con el modelo utilizando el prompt proporcionado
-      var entry = pt + prompt
-      const result = await this.model.generateContent(entry);
+      const useCaseJson = JSON.stringify(useCaseData, null, 2);
+      const promptData = `${prompt} \n${useCaseJson}`;
 
-      // Retorna el contenido de la respues ta
-      return result.response.candidates[0].content.parts[0];
+      console.log('Prompt enviado a la IA:', promptData);
+      console.log(useCaseData);
+      const result = await this.model.generateContent(promptData);
+
+      const responseText = result.response.text();
+
+      return responseText;
     } catch (error) {
       console.error('Error en getCompletion:', error);
-      throw new Error('No se pudo obtener una respuesta de la API de Google Generative AI');
+      throw new Error(
+        'No se pudo obtener una respuesta de la API de Google Generative AI',
+      );
     }
   }
 }

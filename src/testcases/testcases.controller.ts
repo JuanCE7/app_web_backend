@@ -1,6 +1,5 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { TestcasesService } from './testcases.service';
-import { CreateTestCaseDto } from './dto/create-testcase.dto';
 import { UpdateTestCaseDto } from './dto/update-testcase.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
@@ -12,8 +11,8 @@ export class TestcasesController {
   @Post()
   @ApiOperation({ summary : 'Created a testcase'})
   @ApiResponse({status: 200, description : 'A testcase has been successfully created'})
-  create(@Body() CreateTestCaseDto: CreateTestCaseDto) {
-    return this.testcasesService.create(CreateTestCaseDto);
+  create(@Body() body: { id: string }) {
+    return this.testcasesService.create(body.id);
   }
 
   @Get()
