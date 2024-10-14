@@ -37,4 +37,11 @@ export class AuthController {
       role: req.user.role,
     })
   }
+
+  @Post('logout')
+  async logout(@Req() req) {
+    const token = req.headers.authorization;
+    console.log(token)
+    return this.authService.logout(token);
+  }
 }

@@ -16,6 +16,21 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
+  private revokedTokens: Set<string> = new Set();
+
+  revokeToken(token: string) {
+    this.revokedTokens.add(token);
+  }
+
+  isTokenRevoked(token: string): boolean {
+    return this.revokedTokens.has(token);
+  }
+
+  async logout(token: string) {
+    this.revokeToken(token);
+    return { message: 'Successfully logged out' };
+  }
+
   async register({
     firstName,
     lastName,

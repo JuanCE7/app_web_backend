@@ -4,6 +4,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Auth } from 'src/auth/decorators/auth.decorator';
 
 @ApiTags('users')
 @Controller('users')
@@ -29,6 +30,13 @@ export class UsersController {
   @ApiResponse({status: 200, description : 'A user has been successfully returned'})
   async findOne(@Param('id') id: string) {
     return this.usersService.getUserById(id);
+  }
+
+  @Get('/mail/:email')
+  @ApiOperation({ summary : 'Get a user by email'})
+  @ApiResponse({status: 200, description : 'A user has been successfully returned'})
+  async findByEmail(@Param('email') email: string) {
+    return this.usersService.findByEmail(email);
   }
 
   @Patch(':id')

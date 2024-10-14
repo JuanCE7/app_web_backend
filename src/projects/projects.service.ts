@@ -3,23 +3,33 @@ import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Prisma } from '@prisma/client';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class ProjectsService {
   constructor(private prismaService: PrismaService) {}
-
-  // Método para crear un nuevo proyecto
+  
   async create(createProjectDto: CreateProjectDto) {
     try {
-      // Creamos un nuevo proyecto usando el DTO proporcionado
+      
+      let projectCode;
+      let codeExists = true;
+  
+      while (codeExists) {
+        projectCode = uuidv4().split('-')[0].slice(0, 8);
+        codeExists = await this.prismaService.project.findUnique({
+          where: { projectCode },
+        }) !== null;
+      }  
       return await this.prismaService.project.create({
         data: {
-          projectCode: createProjectDto.projectCode,
+          projectCode, 
           name: createProjectDto.name,
           description: createProjectDto.description,
           image: createProjectDto.image,
-          creatorId: createProjectDto.creatorId,
-          // Se pueden agregar más campos si es necesario
+          creator: {
+            connect: { id: createProjectDto.creatorId },
+          },
         },
       });
     } catch (error) {
@@ -57,11 +67,9 @@ export class ProjectsService {
       const projectUpdate = await this.prismaService.project.update({
         where: { id },
         data: {
-          projectCode: updateProjectDto.projectCode,
           name: updateProjectDto.name,
           description: updateProjectDto.description,
           image: updateProjectDto.image,
-          // Puedes agregar más campos si es necesario
         },
       });
 
