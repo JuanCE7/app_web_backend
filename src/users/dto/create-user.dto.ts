@@ -1,24 +1,20 @@
-import { Roles } from '@prisma/client';
 import { Transform } from 'class-transformer';
-import { IsEmail, IsString, MinLength,IsEnum } from 'class-validator';
+import { IsEmail, IsString, MinLength } from 'class-validator';
 
 export class CreateUserDto {
-  @IsString()
-  @MinLength(3)
+  @IsString({ message: 'El nombre es obligatorio y debe ser un texto.' })
+  @MinLength(3, { message: 'El nombre debe tener al menos 3 caracteres.' })
   firstName: string;
 
-  @IsString()
-  @MinLength(3)
+  @IsString({ message: 'El apellido es obligatorio y debe ser un texto.' })
+  @MinLength(3, { message: 'El apellido debe tener al menos 3 caracteres.' })
   lastName: string;
 
-  @IsEmail()
+  @IsEmail({}, { message: 'Debe proporcionar un correo electrónico válido.' })
   email: string;
 
   @Transform(({ value }) => value.trim())
-  @IsString()
-  @MinLength(6)
+  @IsString({ message: 'La contraseña es obligatoria y debe ser un texto.' })
+  @MinLength(6, { message: 'La contraseña debe tener al menos 6 caracteres.' })
   password: string;
-
-  @IsEnum(Roles)
-  role: Roles;
 }

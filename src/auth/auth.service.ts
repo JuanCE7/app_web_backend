@@ -36,10 +36,9 @@ export class AuthService {
     lastName,
     email,
     password,
-    role,
   }: CreateUserDto) {
     const user = await this.usersService.findByEmail(email);
-
+    console.log(user)
     if (user) {
       throw new BadRequestException('User already exists');
     }
@@ -48,15 +47,14 @@ export class AuthService {
       firstName,
       lastName,
       email,
-      password: await bcrypt.hash(password, 10),
-      role,
+      password,
     });
 
     return {
       firstName,
       lastName,
       email,
-      role,
+      password
     };
   }
 
