@@ -16,11 +16,11 @@ export class ProjectsController {
     return this.projectsService.create(createProjectDto);
   }
 
-  @Get()
+  @Get(':userId')
   @ApiOperation({ summary : 'Get projects'})
   @ApiResponse({status: 200, description : 'The projects haS been successfully returned'})
-  findAll() {
-    return this.projectsService.findAll();
+  findAll(@Param('userId') userId: string) {
+    return this.projectsService.findAll(userId);
   }
 
   @Get(':id')

@@ -46,8 +46,15 @@ export class ProjectsService {
   }
 
   // Obtener todos los proyectos
-  findAll() {
-    return this.prismaService.project.findMany();
+  findAll(userId: string) {
+    return this.prismaService.project.findMany({
+      where: {
+        creatorId: userId,
+      },
+      orderBy: {
+        createdAt: 'desc', // Ordena por la fecha de creación en orden descendente
+      },
+    });
   }
 
   // Obtener un proyecto por ID

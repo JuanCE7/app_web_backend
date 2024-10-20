@@ -5,18 +5,18 @@ export class CreateUseCaseDto {
     @MinLength(3)
     displayId: string; // ID de visualización
   
-    @IsString()
-    @MinLength(3)
+    @IsString({ message: 'El nombre es obligatorio y debe ser un texto.' })
+    @MinLength(3, { message: 'El nombre debe tener al menos 3 caracteres.' })
     name: string; // Breve título que describe el caso de uso
   
-    @IsString()
-    @MinLength(10)
+    @IsString({ message: 'La descripción es obligatoria y debe ser un texto.' })
+    @MinLength(10, { message: 'El nombre debe tener al menos 10 caracteres.' })
     description: string; // Detalle del propósito del caso de uso
   
-    @IsArray()
+    @IsArray({ message: 'Las entradas son obligatorias y debe ser un texto.' })
     entries: string[]; // Datos de entrada que el sistema debe procesar
   
-    @IsArray()
+    @IsArray({ message: 'Las precondiciones son obligatorias y debe ser un texto.' })
     preconditions?: string[]; // Condiciones que deben cumplirse antes de ejecutar el caso de uso
   
     @IsArray()
