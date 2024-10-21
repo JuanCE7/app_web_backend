@@ -23,7 +23,7 @@ export class ProjectsController {
     return this.projectsService.findAll(userId);
   }
 
-  @Get(':id')
+  @Get('/project/:id')
   @ApiOperation({ summary : 'Get a project'})
   @ApiResponse({status: 200, description : 'A project has been successfully returned'})
   findOne(@Param('id') id: string) {
