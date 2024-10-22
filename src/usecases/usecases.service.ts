@@ -22,9 +22,16 @@ export class UsecasesService {
       }
     }
   }
- 
-  findAll() {
-    return this.prismaService.useCase.findMany()
+  
+  findAll(projectId: string) {
+    return this.prismaService.useCase.findMany({
+      where: {
+        projectId: projectId,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
   }
 
   async findOne(id: string) {

@@ -28,7 +28,7 @@ model User {
 
 model Project {
   id          String      @id @default(uuid())
-  projectCode String      @unique
+  projectCode String      
   name        String
   description String?
   image       String?
@@ -43,7 +43,7 @@ model Project {
 
 model UseCase {
   id              String      @id @default(uuid()) // ID interno
-  displayId       String   @unique // ID de visualización
+  displayId       String   // ID de visualización
   name            String   // Breve título que describe el caso de uso
   description     String   // Detalle del propósito del caso de uso y su comportamiento esperado
   entries         String[] // Datos de entrada que el sistema debe procesar

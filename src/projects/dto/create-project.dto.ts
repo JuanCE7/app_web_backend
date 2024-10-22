@@ -8,7 +8,6 @@ export class CreateProjectDto {
   @IsString()
   description?: string; 
 
-  @IsUrl()
   @IsOptional()
   image?: string; 
 

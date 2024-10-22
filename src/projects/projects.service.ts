@@ -21,12 +21,14 @@ export class ProjectsService {
           where: { projectCode },
         }) !== null;
       }  
+      const image = createProjectDto.image ? createProjectDto.image : '';
+
       return await this.prismaService.project.create({
         data: {
           projectCode, 
           name: createProjectDto.name,
           description: createProjectDto.description,
-          image: createProjectDto.image,
+          image: image,
           creator: {
             connect: { id: createProjectDto.creatorId },
           },
