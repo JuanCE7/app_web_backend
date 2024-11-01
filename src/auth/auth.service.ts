@@ -6,8 +6,9 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import * as bcrypt from 'bcryptjs';
-import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { LoginDto } from './dto/user-login.dto';
+import { RegisterUserDto } from './dto/register.dto';
+import { Roles } from '@prisma/client';
 
 @Injectable()
 export class AuthService {
@@ -18,6 +19,7 @@ export class AuthService {
 
   private revokedTokens: Set<string> = new Set();
 
+  
   revokeToken(token: string) {
     this.revokedTokens.add(token);
   }
@@ -36,9 +38,8 @@ export class AuthService {
     lastName,
     email,
     password,
-  }: CreateUserDto) {
+  }: RegisterUserDto) {
     const user = await this.usersService.findByEmail(email);
-    console.log(user)
     if (user) {
       throw new BadRequestException('User already exists');
     }
@@ -48,13 +49,15 @@ export class AuthService {
       lastName,
       email,
       password,
+      role: Roles.User
     });
 
     return {
       firstName,
       lastName,
       email,
-      password
+      password,
+      role: Roles.User
     };
   }
 
@@ -79,6 +82,7 @@ export class AuthService {
     };
   }
 
+  
   async profile({ email, role }: { email: string; role: string }) {
     return await this.usersService.findByEmail(email);
   }

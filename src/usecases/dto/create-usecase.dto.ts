@@ -1,4 +1,22 @@
-import { IsString, MinLength, IsArray, IsUUID, IsOptional } from 'class-validator';
+import { Flow } from '@prisma/client';
+import { IsString, MinLength, IsArray, IsUUID, IsOptional, IsObject, IsInt } from 'class-validator';
+
+export class CreateStepDto {
+    @IsInt()
+    number: number;
+
+    @IsString()
+    description: string;
+}
+
+class CreateFlowDto {
+    @IsString()
+    name: string;
+
+    @IsArray()
+    @IsObject({ each: true })
+    steps: CreateStepDto[]; // Asegúrate de que este sea un array de objetos de pasos
+}
 
 export class CreateUseCaseDto {  
     @IsString()
@@ -22,11 +40,11 @@ export class CreateUseCaseDto {
     @IsArray()
     postconditions?: string[]; // Resultado esperado después de ejecutar el caso de uso
   
-    @IsArray()
-    mainFlow: string[]; // Pasos clave que describe el flujo principal del caso de uso
+    @IsArray() // Asegúrate de que sea un array de flujos
+    mainFlow: CreateFlowDto[]; // Pasos clave que describe el flujo principal del caso de uso
   
-    @IsArray()
-    alternateFlows?: string[]; // Flujos alternativos que se desvían del flujo principal
+    @IsArray() // Asegúrate de que sea un array de flujos
+    alternateFlows?: CreateFlowDto[]; // Flujos alternativos que se desvían del flujo principal
   
     @IsUUID()
     projectId: string; // ID del proyecto al que pertenece este caso de uso

@@ -1,14 +1,8 @@
 -- CreateEnum
-CREATE TYPE "Roles" AS ENUM ('Dev', 'Admin', 'Tester');
+CREATE TYPE "Roles" AS ENUM ('User', 'Admin');
 
 -- CreateEnum
-CREATE TYPE "TipoAnalisis" AS ENUM ('Descripcion', 'Precondiciones', 'Pasos', 'DatosDeEntrada', 'ResultadoEsperado');
-
--- CreateEnum
-CREATE TYPE "TestCaseState" AS ENUM ('Pending', 'Executed');
-
--- CreateEnum
-CREATE TYPE "PermissionType" AS ENUM ('Reading', 'Writing', 'Both');
+CREATE TYPE "AnalysisType" AS ENUM ('Description', 'Preconditions', 'Steps', 'InputData', 'ExpectedResult');
 
 -- CreateTable
 CREATE TABLE "User" (
@@ -17,7 +11,7 @@ CREATE TABLE "User" (
     "lastName" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
-    "role" "Roles" NOT NULL DEFAULT 'Dev',
+    "role" "Roles" NOT NULL DEFAULT 'User',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -47,13 +41,23 @@ CREATE TABLE "UseCase" (
     "entries" TEXT[],
     "preconditions" TEXT[],
     "postconditions" TEXT[],
-    "mainFlow" TEXT[],
-    "alternateFlows" TEXT[],
     "projectId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "UseCase_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Flow" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "useCaseMainId" TEXT,
+    "useCaseAlternateId" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Flow_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -76,7 +80,8 @@ CREATE TABLE "Step" (
     "id" TEXT NOT NULL,
     "number" INTEGER NOT NULL,
     "description" TEXT NOT NULL,
-    "testCaseId" TEXT NOT NULL,
+    "testCaseId" TEXT,
+    "flowId" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -84,29 +89,17 @@ CREATE TABLE "Step" (
 );
 
 -- CreateTable
-CREATE TABLE "SecuenciaAnalisis" (
+CREATE TABLE "AnalysisSequence" (
     "id" TEXT NOT NULL,
-    "textoAnalizado" TEXT NOT NULL,
-    "palabrasClave" TEXT[],
-    "explicacion" TEXT NOT NULL,
-    "tipo" "TipoAnalisis" NOT NULL,
+    "analyzedText" TEXT NOT NULL,
+    "keywords" TEXT[],
+    "explanation" TEXT NOT NULL,
+    "type" "AnalysisType" NOT NULL,
     "testCaseId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "SecuenciaAnalisis_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "Permission" (
-    "id" TEXT NOT NULL,
-    "permissionType" "PermissionType" NOT NULL,
-    "userId" TEXT NOT NULL,
-    "projectId" TEXT NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
-
-    CONSTRAINT "Permission_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "AnalysisSequence_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
@@ -115,12 +108,6 @@ CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 -- CreateIndex
 CREATE UNIQUE INDEX "Project_projectCode_key" ON "Project"("projectCode");
 
--- CreateIndex
-CREATE UNIQUE INDEX "UseCase_displayId_key" ON "UseCase"("displayId");
-
--- CreateIndex
-CREATE UNIQUE INDEX "TestCase_displayId_key" ON "TestCase"("displayId");
-
 -- AddForeignKey
 ALTER TABLE "Project" ADD CONSTRAINT "Project_creatorId_fkey" FOREIGN KEY ("creatorId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
@@ -128,16 +115,19 @@ ALTER TABLE "Project" ADD CONSTRAINT "Project_creatorId_fkey" FOREIGN KEY ("crea
 ALTER TABLE "UseCase" ADD CONSTRAINT "UseCase_projectId_fkey" FOREIGN KEY ("projectId") REFERENCES "Project"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "Flow" ADD CONSTRAINT "Flow_useCaseMainId_fkey" FOREIGN KEY ("useCaseMainId") REFERENCES "UseCase"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Flow" ADD CONSTRAINT "Flow_useCaseAlternateId_fkey" FOREIGN KEY ("useCaseAlternateId") REFERENCES "UseCase"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "TestCase" ADD CONSTRAINT "TestCase_projectId_fkey" FOREIGN KEY ("projectId") REFERENCES "Project"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Step" ADD CONSTRAINT "Step_testCaseId_fkey" FOREIGN KEY ("testCaseId") REFERENCES "TestCase"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Step" ADD CONSTRAINT "Step_testCaseId_fkey" FOREIGN KEY ("testCaseId") REFERENCES "TestCase"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "SecuenciaAnalisis" ADD CONSTRAINT "SecuenciaAnalisis_testCaseId_fkey" FOREIGN KEY ("testCaseId") REFERENCES "TestCase"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Step" ADD CONSTRAINT "Step_flowId_fkey" FOREIGN KEY ("flowId") REFERENCES "Flow"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Permission" ADD CONSTRAINT "Permission_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Permission" ADD CONSTRAINT "Permission_projectId_fkey" FOREIGN KEY ("projectId") REFERENCES "Project"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "AnalysisSequence" ADD CONSTRAINT "AnalysisSequence_testCaseId_fkey" FOREIGN KEY ("testCaseId") REFERENCES "TestCase"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

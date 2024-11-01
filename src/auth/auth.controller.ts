@@ -4,6 +4,7 @@ import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { LoginDto } from './dto/user-login.dto';
 import { Request } from 'express';
 import { Auth } from './decorators/auth.decorator';
+import { RegisterUserDto } from './dto/register.dto';
 
 interface RequestWithUser extends Request {
   user: { email: string; role: string };
@@ -16,7 +17,7 @@ export class AuthController {
   @Post('register')
   register(
     @Body()
-    registerDto: CreateUserDto,
+    registerDto: RegisterUserDto,
   ) {
     return this.authService.register(registerDto);
   }
@@ -30,7 +31,7 @@ export class AuthController {
   }
 
   @Get('profile')
-  @Auth("Dev") 
+  @Auth("User") 
   profile(@Req() req: RequestWithUser) {
     return this.authService.profile({
       email: req.user.email,
