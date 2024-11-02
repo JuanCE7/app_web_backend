@@ -38,7 +38,6 @@ model Project {
   updatedAt   DateTime     @updatedAt
 }
 
-
 model TestCase {
   id              String             @id @default(uuid()) // ID interno
   displayId       String             // ID de visualización
@@ -48,24 +47,24 @@ model TestCase {
   inputData       String[]           // Datos de entrada usados en la prueba (basado en entradas del caso de uso)
   expectedResult  String?            // Lo que se espera que el sistema devuelva o realice
   projectId       String
-  project         Project            @relation("ProjectTestCases", fields: [projectId], references: [id], onDelete: Cascade) // Relación con el proyecto
+  project         Project             @relation("ProjectTestCases", fields: [projectId], references: [id], onDelete: Cascade) // Relación con el proyecto
   analysisSequence AnalysisSequence[] @relation("TestCaseAnalysisSequences") // Relación con la tabla de secuencia de análisis
-  createdAt       DateTime           @default(now())
-  updatedAt       DateTime           @updatedAt
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
 }
 
 model UseCase {
-  id              String     @id @default(uuid()) // ID interno
-  displayId       String     @unique // ID de visualización único
-  name            String     // Breve título que describe el caso de uso
-  description     String     // Detalle del propósito del caso de uso y su comportamiento esperado
-  entries         String[]   // Datos de entrada que el sistema debe procesar
-  preconditions   String[]   // Condiciones que deben cumplirse antes de que se ejecute el caso de uso
-  postconditions  String[]   // Resultado esperado después de ejecutar el caso de uso
-  mainFlow        Flow[]     @relation("MainFlow")       // Flujos principales
-  alternateFlows  Flow[]     @relation("AlternateFlow")  // Flujos alternativos
+  id              String     @id @default(uuid())
+  displayId       String     @unique
+  name            String
+  description     String
+  entries         String[]
+  preconditions   String[]
+  postconditions  String[]
+  mainFlow        Flow[]     @relation("MainFlow") // Sin `onDelete: Cascade`
+  alternateFlows  Flow[]     @relation("AlternateFlow") // Sin `onDelete: Cascade`
   projectId       String
-  project         Project    @relation("ProjectUseCases", fields: [projectId], references: [id], onDelete: Cascade) // Relación con el proyecto
+  project         Project    @relation("ProjectUseCases", fields: [projectId], references: [id], onDelete: Cascade)
   createdAt       DateTime   @default(now())
   updatedAt       DateTime   @updatedAt
 }
@@ -73,11 +72,11 @@ model UseCase {
 model Flow {
   id                 String    @id @default(uuid())
   name               String
-  steps              Step[]    @relation("FlowSteps") // Relación uno a muchos con Steps
-  useCaseMainId      String?   // Relación opcional para el flujo principal
-  useCaseAlternateId String?   // Relación opcional para el flujo alternativo
-  useCaseMain        UseCase?  @relation("MainFlow", fields: [useCaseMainId], references: [id], onDelete: Cascade) // Flujos principales
-  useCaseAlternate   UseCase?  @relation("AlternateFlow", fields: [useCaseAlternateId], references: [id], onDelete: Cascade) // Flujos alternativos
+  steps              Step[]    @relation("FlowSteps") // Sin `onDelete: Cascade`
+  useCaseMainId      String?
+  useCaseAlternateId String?
+  useCaseMain        UseCase?  @relation("MainFlow", fields: [useCaseMainId], references: [id], onDelete: Cascade) // Aquí es correcto
+  useCaseAlternate   UseCase?  @relation("AlternateFlow", fields: [useCaseAlternateId], references: [id], onDelete: Cascade) // Aquí es correcto
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt
 }
@@ -87,13 +86,12 @@ model Step {
   number      Int
   description String
   testCaseId  String?
-  testCase    TestCase? @relation("TestCaseSteps", fields: [testCaseId], references: [id], onDelete: Cascade) // Eliminación en cascada
+  testCase    TestCase? @relation("TestCaseSteps", fields: [testCaseId], references: [id], onDelete: Cascade)
   flowId      String?
-  flow        Flow?     @relation("FlowSteps", fields: [flowId], references: [id], onDelete: Cascade) // Eliminación en cascada desde Flow
+  flow        Flow?     @relation("FlowSteps", fields: [flowId], references: [id], onDelete: Cascade) // Aquí es correcto
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 }
-
 
 model AnalysisSequence {
   id            String      @id @default(uuid())
