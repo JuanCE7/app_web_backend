@@ -55,14 +55,15 @@ model TestCase {
 
 model UseCase {
   id              String     @id @default(uuid())
-  displayId       String     @unique
+  displayId       String     
   name            String
   description     String
   entries         String[]
   preconditions   String[]
   postconditions  String[]
-  mainFlow        Flow[]     @relation("MainFlow") // Sin `onDelete: Cascade`
-  alternateFlows  Flow[]     @relation("AlternateFlow") // Sin `onDelete: Cascade`
+  mainFlowId      String?    @unique // Clave foránea única para la relación uno a uno con Flow
+  mainFlow        Flow?      @relation("MainFlow", fields: [mainFlowId], references: [id])
+  alternateFlows  Flow[]     @relation("AlternateFlow") // Relación uno a muchos con Flow
   projectId       String
   project         Project    @relation("ProjectUseCases", fields: [projectId], references: [id], onDelete: Cascade)
   createdAt       DateTime   @default(now())
@@ -70,16 +71,13 @@ model UseCase {
 }
 
 model Flow {
-  id                 String    @id @default(uuid())
-  name               String
-  steps              Step[]    @relation("FlowSteps") // Sin `onDelete: Cascade`
-  useCaseMainId      String?
-  useCaseAlternateId String?
-  useCaseMain        UseCase?  @relation("MainFlow", fields: [useCaseMainId], references: [id], onDelete: Cascade) // Aquí es correcto
-  useCaseAlternate   UseCase?  @relation("AlternateFlow", fields: [useCaseAlternateId], references: [id], onDelete: Cascade) // Aquí es correcto
-  createdAt          DateTime  @default(now())
-  updatedAt          DateTime  @updatedAt
+  id              String     @id @default(uuid())
+  name            String
+  steps           Step[]     @relation("FlowSteps")
+  useCaseMainFlow UseCase?   @relation("MainFlow") // Relación inversa uno a uno con UseCase
+  useCaseAltFlow  UseCase[]  @relation("AlternateFlow") // Relación inversa uno a muchos con UseCase
 }
+
 
 model Step {
   id          String    @id @default(uuid())

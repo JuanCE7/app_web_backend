@@ -14,73 +14,66 @@ export class UsecasesService {
 
   async create(createUsecaseDto: CreateUseCaseDto) {
     try {
-        // Primero, crea el caso de uso y almacena la referencia
-        const useCase = await this.prismaService.useCase.create({
+      // Primero, crea el caso de uso y almacena la referencia
+      const useCase = await this.prismaService.useCase.create({
+        data: {
+          displayId: createUsecaseDto.displayId,
+          name: createUsecaseDto.name,
+          description: createUsecaseDto.description,
+          entries: createUsecaseDto.entries,
+          preconditions: createUsecaseDto.preconditions,
+          postconditions: createUsecaseDto.postconditions,
+          projectId: createUsecaseDto.projectId,
+        },
+      });
+
+      // Crea el flujo principal (uno a uno)
+      const mainFlow = await this.prismaService.flow.create({
+        data: {
+          name: createUsecaseDto.mainFlow.name,
+          steps: {
+            create: createUsecaseDto.mainFlow.steps.map(step => ({
+              number: step.number,
+              description: step.description,
+            })),
+          },
+          useCaseMainFlow: { connect: { id: useCase.id } }, // Relaciona con el caso de uso
+        },
+      });
+
+      // Crea los flujos alternativos (uno a muchos)
+      const alternateFlows = await Promise.all(
+        createUsecaseDto.alternateFlows.map(flow =>
+          this.prismaService.flow.create({
             data: {
-                displayId: createUsecaseDto.displayId,
-                name: createUsecaseDto.name,
-                description: createUsecaseDto.description,
-                entries: createUsecaseDto.entries,
-                preconditions: createUsecaseDto.preconditions,
-                postconditions: createUsecaseDto.postconditions,
-                projectId: createUsecaseDto.projectId,
+              name: flow.name,
+              steps: {
+                create: flow.steps.map(step => ({
+                  number: step.number,
+                  description: step.description,
+                })),
+              },
+              useCaseAltFlow: { connect: { id: useCase.id } }, // Relaciona con el caso de uso
             },
-        });
+          })
+        )
+      );
 
-        // Crea los flujos principales
-        const mainFlows = await Promise.all(
-            createUsecaseDto.mainFlow.map(flow =>
-                this.prismaService.flow.create({
-                    data: {
-                        name: flow.name,
-                        steps: {
-                            create: flow.steps.map(step => ({
-                                number: step.number,
-                                description: step.description,
-                            })),
-                        },
-                        useCaseMainId: useCase.id, // Asociar con el caso de uso
-                    },
-                })
-            )
-        );
-
-        // Crea los flujos alternativos
-        const alternateFlows = await Promise.all(
-            createUsecaseDto.alternateFlows.map(flow =>
-                this.prismaService.flow.create({
-                    data: {
-                        name: flow.name,
-                        steps: {
-                            create: flow.steps.map(step => ({
-                                number: step.number,
-                                description: step.description,
-                            })),
-                        },
-                        useCaseAlternateId: useCase.id, // Asociar con el caso de uso
-                    },
-                })
-            )
-        );
-
-        return {
-            ...useCase,
-            mainFlows,
-            alternateFlows,
-        };
+      return {
+        ...useCase,
+        mainFlow,
+        alternateFlows,
+      };
     } catch (error) {
-        console.log(error);
-        if (error instanceof Prisma.PrismaClientKnownRequestError) {
-            if (error.code === "P2002") {
-                throw new ConflictException(`Use Case with name ${createUsecaseDto.name} already exists`);
-            }
+      console.log(error);
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === "P2002") {
+          throw new ConflictException(`Use Case with name ${createUsecaseDto.name} already exists`);
         }
-        throw new InternalServerErrorException('An error occurred while creating the use case');
+      }
+      throw new InternalServerErrorException('An error occurred while creating the use case');
     }
-}
-
-
-
+  }
 
   findAll(projectId: string) {
     return this.prismaService.useCase.findMany({

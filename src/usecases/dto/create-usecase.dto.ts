@@ -40,10 +40,11 @@ export class CreateUseCaseDto {
     @IsArray()
     postconditions?: string[]; // Resultado esperado después de ejecutar el caso de uso
   
-    @IsArray() // Asegúrate de que sea un array de flujos
-    mainFlow: CreateFlowDto[]; // Pasos clave que describe el flujo principal del caso de uso
+    @IsObject({ each: true })
+    mainFlow: CreateFlowDto; // Pasos clave que describe el flujo principal del caso de uso
   
     @IsArray() // Asegúrate de que sea un array de flujos
+    @IsOptional()
     alternateFlows?: CreateFlowDto[]; // Flujos alternativos que se desvían del flujo principal
   
     @IsUUID()
