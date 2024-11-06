@@ -12,20 +12,20 @@ export class ProjectsService {
   async create(createProjectDto: CreateProjectDto) {
     try {
       
-      let projectCode;
+      let code;
       let codeExists = true;
   
       while (codeExists) {
-        projectCode = uuidv4().split('-')[0].slice(0, 8);
+        code = uuidv4().split('-')[0].slice(0, 8);
         codeExists = await this.prismaService.project.findUnique({
-          where: { projectCode },
+          where: { code },
         }) !== null;
       }  
       const image = createProjectDto.image ? createProjectDto.image : '';
 
       return await this.prismaService.project.create({
         data: {
-          projectCode, 
+          code, 
           name: createProjectDto.name,
           description: createProjectDto.description,
           image: image,

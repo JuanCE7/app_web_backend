@@ -34,7 +34,7 @@ export class TestcasesService {
       // Parsear el texto plano generado a JSON
       // console.log("hola",generatedTestCase2[1]);
       const generatedTestCase = JSON.parse(generatedTestCase2);
-      console.log('hola', generatedTestCase);
+
       if (
         !generatedTestCase ||
         !generatedTestCase.testCases ||
@@ -57,18 +57,11 @@ export class TestcasesService {
         // Crear cada test case en la base de datos usando Prisma
         await this.prismaService.testCase.create({
           data: {
-            displayId: testCaseData.strId,
+            code: testCaseData.strId,
             name: testCaseData.strDescription,
-            steps: {
-              create: testCaseData.lstSteps.map(
-                (step: string, index: number) => ({
-                  number: index + 1, // Asigna un número de paso en orden
-                  description: step,
-                }),
-              ),
-            },
+            steps: testCaseData.strSteps,
             description: testCaseData.strDescription,
-            inputData: inputDataArray, // Guarda los inputs como un string JSON
+            inputData: inputDataArray, 
             expectedResult: JSON.stringify(testCaseData.lstPreconditions), // Igual con las precondiciones si es necesario
             projectId: useCase.projectId,
           },

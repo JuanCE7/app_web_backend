@@ -1,6 +1,6 @@
 import { Roles } from '@prisma/client';
 import { Transform } from 'class-transformer';
-import { IsEmail, IsString, MinLength } from 'class-validator';
+import { IsEmail, IsOptional, IsString, MinLength } from 'class-validator';
 
 export class CreateUserDto {
   @IsString({ message: 'El nombre es obligatorio y debe ser un texto.' })
@@ -21,4 +21,7 @@ export class CreateUserDto {
 
   @IsString({ message: 'El rol es obligatorio.' })
   role: Roles;
+
+  @IsOptional({ message: 'El estado es obligatorio.' })
+  status: boolean;
 }

@@ -31,7 +31,7 @@ export class AuthController {
   }
 
   @Get('profile')
-  @Auth("User") 
+  @Auth("Tester") 
   profile(@Req() req: RequestWithUser) {
     return this.authService.profile({
       email: req.user.email,

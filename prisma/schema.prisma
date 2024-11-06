@@ -8,97 +8,76 @@ datasource db {
 }
 
 enum Roles {
-  User
-  Admin
+  Tester
+  Administrator
 }
 
 model User {
   id          String      @id @default(uuid())
+  status      Boolean     @default(true)
   firstName   String  
   lastName    String
   email       String      @unique
   password    String
-  role        Roles       @default(User) 
-  projects    Project[]   // Relación uno a muchos con Proyecto (proyectos creados por el usuario)
+  role        Roles       @default(Tester) 
+  image       String?
+  projects    Project[]   
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
 }
 
 model Project {
   id          String      @id @default(uuid())
-  projectCode String      @unique
+  code        String      @unique
   name        String
   description String?
   image       String?
-  creatorId   String       // ID del creador del proyecto
-  creator     User         @relation(fields: [creatorId], references: [id], onDelete: Cascade) // Relación con el usuario creador
-  useCases    UseCase[]    @relation("ProjectUseCases")   // Relación uno a muchos con CasoDeUso
-  testCases   TestCase[]    @relation("ProjectTestCases")  // Relación uno a muchos con CasoDePrueba
+  creatorId   String       
+  creator     User         @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  useCases    UseCase[]    @relation("ProjectUseCases")  
+  testCases   TestCase[]    @relation("ProjectTestCases")  
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
 }
 
-model TestCase {
-  id              String             @id @default(uuid()) // ID interno
-  displayId       String             // ID de visualización
-  name            String             // Nombre descriptivo basado en el caso de uso
-  description     String             // Explicación del objetivo del caso de prueba
-  steps           Step[]             @relation("TestCaseSteps") // Relación uno a muchos con pasos
-  inputData       String[]           // Datos de entrada usados en la prueba (basado en entradas del caso de uso)
-  expectedResult  String?            // Lo que se espera que el sistema devuelva o realice
-  projectId       String
-  project         Project             @relation("ProjectTestCases", fields: [projectId], references: [id], onDelete: Cascade) // Relación con el proyecto
-  analysisSequence AnalysisSequence[] @relation("TestCaseAnalysisSequences") // Relación con la tabla de secuencia de análisis
-  createdAt       DateTime            @default(now())
-  updatedAt       DateTime            @updatedAt
-}
-
 model UseCase {
   id              String     @id @default(uuid())
-  displayId       String     
+  code            String     
   name            String
   description     String
-  entries         String[]
-  preconditions   String[]
-  postconditions  String[]
-  mainFlowId      String?    @unique // Clave foránea única para la relación uno a uno con Flow
-  mainFlow        Flow?      @relation("MainFlow", fields: [mainFlowId], references: [id])
-  alternateFlows  Flow[]     @relation("AlternateFlow") // Relación uno a muchos con Flow
+  preconditions   String
+  postconditions  String
+  mainFlow        String      
+  alternateFlows  String?    
   projectId       String
   project         Project    @relation("ProjectUseCases", fields: [projectId], references: [id], onDelete: Cascade)
   createdAt       DateTime   @default(now())
   updatedAt       DateTime   @updatedAt
 }
 
-model Flow {
-  id              String     @id @default(uuid())
-  name            String
-  steps           Step[]     @relation("FlowSteps")
-  useCaseMainFlow UseCase?   @relation("MainFlow") // Relación inversa uno a uno con UseCase
-  useCaseAltFlow  UseCase[]  @relation("AlternateFlow") // Relación inversa uno a muchos con UseCase
+model TestCase {
+  id              String             @id @default(uuid())
+  code            String            
+  name            String             
+  description     String             
+  steps           String            
+  inputData       String           
+  expectedResult  String?           
+  projectId       String
+  project         Project             @relation("ProjectTestCases", fields: [projectId], references: [id], onDelete: Cascade) 
+  explanations    Explanation[]     @relation("TestCaseExplanation") 
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
 }
 
-
-model Step {
-  id          String    @id @default(uuid())
-  number      Int
-  description String
-  testCaseId  String?
-  testCase    TestCase? @relation("TestCaseSteps", fields: [testCaseId], references: [id], onDelete: Cascade)
-  flowId      String?
-  flow        Flow?     @relation("FlowSteps", fields: [flowId], references: [id], onDelete: Cascade) // Aquí es correcto
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-}
-
-model AnalysisSequence {
+model Explanation {
   id            String      @id @default(uuid())
-  analyzedText  String      // Texto analizado en esta parte del caso de prueba
-  keywords      String[]    // Palabras clave identificadas en el análisis
-  explanation   String      // Explicación de cómo se interpreta el texto
-  type          AnalysisType // Enum para indicar la parte que se está analizando (Description, Preconditions, etc.)
+  analyzedText  String      
+  keywords      String   
+  explanation   String  
+  type          AnalysisType 
   testCaseId    String
-  testCase      TestCase    @relation("TestCaseAnalysisSequences", fields: [testCaseId], references: [id], onDelete: Cascade) // Eliminación en cascada
+  testCase      TestCase    @relation("TestCaseExplanation", fields: [testCaseId], references: [id], onDelete: Cascade) 
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
 }

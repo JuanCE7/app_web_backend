@@ -49,7 +49,8 @@ export class AuthService {
       lastName,
       email,
       password,
-      role: Roles.User
+      status: true,
+      role: Roles.Tester
     });
 
     return {
@@ -57,7 +58,8 @@ export class AuthService {
       lastName,
       email,
       password,
-      role: Roles.User
+      status: true,
+      role: Roles.Tester
     };
   }
 
@@ -81,7 +83,6 @@ export class AuthService {
       role: user.role,
     };
   }
-
   
   async profile({ email, role }: { email: string; role: string }) {
     return await this.usersService.findByEmail(email);

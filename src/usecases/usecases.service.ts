@@ -17,52 +17,19 @@ export class UsecasesService {
       // Primero, crea el caso de uso y almacena la referencia
       const useCase = await this.prismaService.useCase.create({
         data: {
-          displayId: createUsecaseDto.displayId,
+          code: createUsecaseDto.code,
           name: createUsecaseDto.name,
           description: createUsecaseDto.description,
-          entries: createUsecaseDto.entries,
           preconditions: createUsecaseDto.preconditions,
           postconditions: createUsecaseDto.postconditions,
           projectId: createUsecaseDto.projectId,
+          mainFlow: createUsecaseDto.mainFlow,
+          alternateFlows: createUsecaseDto.alternateFlows
         },
       });
-
-      // Crea el flujo principal (uno a uno)
-      const mainFlow = await this.prismaService.flow.create({
-        data: {
-          name: createUsecaseDto.mainFlow.name,
-          steps: {
-            create: createUsecaseDto.mainFlow.steps.map(step => ({
-              number: step.number,
-              description: step.description,
-            })),
-          },
-          useCaseMainFlow: { connect: { id: useCase.id } }, // Relaciona con el caso de uso
-        },
-      });
-
-      // Crea los flujos alternativos (uno a muchos)
-      const alternateFlows = await Promise.all(
-        createUsecaseDto.alternateFlows.map(flow =>
-          this.prismaService.flow.create({
-            data: {
-              name: flow.name,
-              steps: {
-                create: flow.steps.map(step => ({
-                  number: step.number,
-                  description: step.description,
-                })),
-              },
-              useCaseAltFlow: { connect: { id: useCase.id } }, // Relaciona con el caso de uso
-            },
-          })
-        )
-      );
 
       return {
         ...useCase,
-        mainFlow,
-        alternateFlows,
       };
     } catch (error) {
       console.log(error);
@@ -97,45 +64,36 @@ export class UsecasesService {
     return useCaseFound;
   }
 
-  // async update(id: string, updateUsecaseDto: UpdateUseCaseDto) {
-  //   try {
-  //     return await this.prismaService.useCase.update({
-  //       where: { id }, // Identificador del caso de uso a actualizar
-  //       data: {
-  //         name: updateUsecaseDto.name,
-  //         description: updateUsecaseDto.description,
-  //         entries: updateUsecaseDto.entries,
-  //         mainFlow: {
-  //           connect: updateUsecaseDto.mainFlow.map((flow) => ({ id: flow.id })), // Conecta los flujos principales existentes
-  //         },
-  //         preconditions: {
-  //           set: updateUsecaseDto.preconditions || [], // Asigna las precondiciones (si existen)
-  //         },
-  //         postconditions: {
-  //           set: updateUsecaseDto.postconditions || [], // Asigna las postcondiciones (si existen)
-  //         },
-  //         projectId: updateUsecaseDto.projectId, // ID del proyecto
-  //         alternateFlows: {
-  //           connect: updateUsecaseDto.alternateFlows?.map((flow) => ({
-  //             id: flow.id,
-  //           })), // Conecta los flujos alternativos existentes
-  //         },
-  //         displayId: updateUsecaseDto.displayId, // ID de visualización
-  //       },
-  //     });
-  //   } catch (error) {
-  //     console.log(error);
-  //     if (error instanceof Prisma.PrismaClientKnownRequestError) {
-  //       // Aquí puedes manejar errores específicos de Prisma
-  //       if (error.code === 'P2002') {
-  //         throw new ConflictException(
-  //           `Use Case with name ${updateUsecaseDto.name} already exists`,
-  //         );
-  //       }
-  //     }
-  //     throw error; // Re-lanzar otros errores
-  //   }
-  // }
+  // Actualizar un usecase existente
+  async update(id: string, updateUseCaseDto: UpdateUseCaseDto) {
+    try {
+      const useCaseUpdate = await this.prismaService.useCase.update({
+        where: { id },
+        data: {
+          code: updateUseCaseDto.code,
+          name: updateUseCaseDto.name,
+          description: updateUseCaseDto.description,
+          preconditions: updateUseCaseDto.preconditions,
+          postconditions: updateUseCaseDto.postconditions,
+          mainFlow: updateUseCaseDto.mainFlow,
+          alternateFlows: updateUseCaseDto.alternateFlows
+        },
+      });
+
+      if (!useCaseUpdate) {
+        throw new NotFoundException(`UseCase with id ${id} not found`);
+      }
+
+      return useCaseUpdate;
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2025') {
+          throw new NotFoundException(`UseCase with id ${id} not found`);
+        }
+      }
+      throw error;
+    }
+  }
 
   async remove(id: string) {
     const deletedUseCase = await this.prismaService.useCase.delete({

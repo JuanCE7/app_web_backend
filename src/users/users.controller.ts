@@ -42,16 +42,8 @@ export class UsersController {
   @Patch(':id')
   @ApiOperation({ summary : 'Update a user'})
   @ApiResponse({status: 200, description : 'A user has been successfully updated'})
-  @Roles('Admin')  // Solo los Admins pueden actualizar usuarios
+  @Roles('Administrator')  // Solo los Admins pueden actualizar usuarios
   async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.updateUser(id, updateUserDto);
-  }
-
-  @Delete(':id')
-  @ApiOperation({ summary : 'Delete a user'})
-  @ApiResponse({status: 200, description : 'A user has been successfully deleted '})
-  @Roles('Admin')  // Solo los Admins pueden eliminar usuarios
-  async remove(@Param('id') id: string) {
-    return this.usersService.deleteUser(id);
   }
 }

@@ -94,22 +94,6 @@ export class UsersService {
     }
   }
 
-  // Eliminar usuario
-  async deleteUser(id: string) {
-    try {
-      await this.prisma.user.delete({ where: { id } });
-      return { message: `User with id ${id} deleted successfully` };
-    } catch (error) {
-      if (
-        error instanceof Prisma.PrismaClientKnownRequestError &&
-        error.code === 'P2025'
-      ) {
-        throw new NotFoundException(`User with id ${id} not found`);
-      }
-      throw error;
-    }
-  }
-
   // Método para encontrar un usuario por email
   async findByEmail(email: string) {
     const user = await this.prisma.user.findUnique({
