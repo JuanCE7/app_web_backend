@@ -9,7 +9,7 @@ export class CreateUseCaseDto {
     name: string; // Breve título que describe el caso de uso
   
     @IsString({ message: 'La descripción es obligatoria y debe ser un texto.' })
-    @MinLength(10, { message: 'El nombre debe tener al menos 10 caracteres.' })
+    @MinLength(10, { message: 'La descripcion debe tener al menos 10 caracteres.' })
     description: string; // Detalle del propósito del caso de uso
     
     @IsString({ message: 'Las precondiciones son obligatorias y debe ser un texto.' })

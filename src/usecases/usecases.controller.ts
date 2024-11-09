@@ -23,19 +23,19 @@ export class UsecasesController {
     return this.usecasesService.findAll(projectId);
   }
 
-  @Get(':id')
+  @Get('/usecase/:id')
   @ApiOperation({ summary : 'Get a usecase'})
   @ApiResponse({status: 200, description : 'A usecase has been successfully returned'})
   findOne(@Param('id') id: string) {
     return this.usecasesService.findOne(id);
   }
 
-  // @Patch(':id')
-  // @ApiOperation({ summary : 'Update a usecase'})
-  // @ApiResponse({status: 200, description : 'A usecase has been successfully updated'})
-  // update(@Param('id') id: string, @Body() UpdateUseCaseDto: UpdateUseCaseDto) {
-  //   return this.usecasesService.update(id, UpdateUseCaseDto);
-  // }
+  @Patch(':id')
+  @ApiOperation({ summary : 'Update a usecase'})
+  @ApiResponse({status: 200, description : 'A usecase has been successfully updated'})
+  update(@Param('id') id: string, @Body() UpdateUseCaseDto: UpdateUseCaseDto) {
+    return this.usecasesService.update(id, UpdateUseCaseDto);
+  }
 
   @Delete(':id')
   @ApiOperation({ summary : 'Delete a usecase'})
