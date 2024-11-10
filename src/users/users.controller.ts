@@ -42,8 +42,7 @@ export class UsersController {
   @Patch(':id')
   @ApiOperation({ summary : 'Update a user'})
   @ApiResponse({status: 200, description : 'A user has been successfully updated'})
-  @Roles('Administrator')  // Solo los Admins pueden actualizar usuarios
   async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.updateUser(id, updateUserDto);
+    return this.usersService.updateProfileUser(id, updateUserDto);
   }
 }

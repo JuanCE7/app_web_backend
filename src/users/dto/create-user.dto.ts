@@ -10,6 +10,9 @@ export class CreateUserDto {
   @IsString({ message: 'El apellido es obligatorio y debe ser un texto.' })
   @MinLength(3, { message: 'El apellido debe tener al menos 3 caracteres.' })
   lastName: string;
+  
+  @IsOptional()
+  image: string;
 
   @IsEmail({}, { message: 'Debe proporcionar un correo electrónico válido.' })
   email: string;

@@ -50,7 +50,8 @@ export class AuthService {
       email,
       password,
       status: true,
-      role: Roles.Tester
+      role: Roles.Tester,
+      image: ""
     });
 
     return {
