@@ -2,17 +2,25 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { TestcasesService } from './testcases.service';
 import { UpdateTestCaseDto } from './dto/update-testcase.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { CreateTestCaseDto } from './dto/create-testcase.dto';
 
 @ApiTags('testcases')
 @Controller('testcases')
 export class TestcasesController {
   constructor(private readonly testcasesService: TestcasesService) {}
 
+  @Post('/generate/:id')
+  @ApiOperation({ summary : 'Generate a testcase'})
+  @ApiResponse({status: 200, description : 'A testcase has been successfully generated'})
+  generate(@Param('id') id: string) {
+    return this.testcasesService.generateTestCase(id);
+  }
+
   @Post()
-  @ApiOperation({ summary : 'Created a testcase'})
+  @ApiOperation({ summary : 'Generate a testcase'})
   @ApiResponse({status: 200, description : 'A testcase has been successfully created'})
-  create(@Body() body: { id: string }) {
-    return this.testcasesService.create(body.id);
+  create(@Body() createTestCaseDto: CreateTestCaseDto) {
+    return this.testcasesService.create(createTestCaseDto);
   }
 
   @Get()

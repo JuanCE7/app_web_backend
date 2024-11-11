@@ -1,50 +1,28 @@
 export const jwtSecret = process.env.JWT_SECRET;
 export const api_key = process.env.GOOGLE_GENAI_API_KEY;
-export const prompt = `Act as a software engineer specialising in functional test case design. I will provide you with a use case, analyse it to determine a set of functional test cases based on this JSON schema, for as many test cases as you can find. In the explanation I require you to detail step by step, how you arrived at that proposal, how the keywords found serve you, why they are keywords and what other steps you execute internally in it to achieve the result:
+export const prompt = `Actúa como un ingeniero de software especializado en el diseño de casos de prueba funcionales. Te proporcionaré un caso de uso en formato JSON. Analiza este caso de uso para determinar un conjunto de casos de prueba funcionales basados en este esquema JSON, generando tantos casos de prueba funcionales como sea posible. En la explanation, detalla paso a paso cómo llegaste a esa propuesta.
+El esquema JSON del caso de prueba funcional debe tener el siguiente formato:
 {
   "testCases": [
     {
-      "strId": "Unique identifier for the test case, typically in the format 'TC01', 'TC02', etc.",
-      "strDescription": "A brief but clear description of the test case's objective, indicating which functionality or behavior is being verified.",
-      "lstPreconditions": ["Preconditions that must be met before executing the test case, such as the system state or user role."],
-      "lstSteps": ["Sequence of steps the user must follow to execute the test case. Each step should be clear and concise, explaining the specific interaction with the system."],
-      "lstInputs": ["Input data required to perform the test case, such as form fields or parameter values provided by the user."],
-      "strResult": "The expected result after executing the test case. It should describe the behavior or output the system should display if functioning correctly.",
-      "lstCreationSecuence": {
-        "Analyst": {
-          "obtDescription": {
-            "strAnalystText": "Analyzed description of the test case by the analyst, providing an interpretation or justification for the test case.",
-            "lstKeyWords": "Keywords identified in the description that help define the critical elements of the test case.",
-            "strExplication": "Detailed explanation of why these keywords are important and how they contribute to the creation of the test case."
-          },
-          "obtPreconditions": {
-            "strAnalystText": "Text analyzed by the analyst regarding the preconditions, explaining their relevance in the test case context.",
-            "lstKeyWords": "Keywords identified in the preconditions that define important constraints before running the test.",
-            "strExplication": "Justification of how these preconditions impact the test and why they are essential."
-          },
-          "obtSteps": {
-            "strAnalystText": "Analyst's interpretation of the steps the user must take to execute the test case.",
-            "lstKeyWords": "Keywords in the steps that help identify key actions or interactions within the test.",
-            "strExplication": "Explanation of the importance of these steps in the context of the test and how they relate to the system's functionality."
-          },
-          "obtInputs": {
-            "strAnalystText": "Analysis of the input data provided in the test case, highlighting its relevance.",
-            "lstKeyWords": "Keywords that indicate the most important input data for the test.",
-            "strExplication": "Analyst's explanation of why this input data is crucial for test execution."
-          },
-          "obtResult": {
-            "strAnalystText": "Analysis of the expected result of the test case as interpreted by the analyst.",
-            "lstKeyWords": "Keywords that define the most critical expected behavior or outputs.",
-            "strExplication": "Analyst's explanation of the importance of the expected result and its relevance in validating the tested functionality."
-          }
-        }
+      "code": "Identificador único del caso de prueba funcional, típicamente en el formato 'TC01', 'TC02', etc.",
+      "name": "Un nombre del caso de prueba funcional, que indique de forma concisa de lo que trata.",
+      "description": "Una descripción breve pero clara del objetivo del caso de prueba funcional, indicando qué funcionalidad o comportamiento se está verificando.",
+      "steps": "Secuencia de pasos (en formato de string) que el usuario debe seguir para ejecutar el caso de prueba. Cada paso debe ser claro y conciso, explicando la interacción específica con el sistema.",
+      "inputData": "Datos de entrada necesarios (en formato de string) para realizar el caso de prueba, como campos de formularios o valores de parámetros proporcionados por el usuario.",
+      "expectedResult": "El resultado esperado después de ejecutar el caso de prueba. Debe describir el comportamiento o salida que el sistema debe mostrar si funciona correctamente.",
+      "explanation": {
+        "summary": "Un resumen de alto nivel que describe la naturaleza del caso de uso que se está analizando y cómo se generó el caso de prueba.",
+        "details": "Explicación detallada de alto nivel que describe el proceso de transformación de caso de uso a caso de prueba, haciendo referencia a técnicas específicas recomendadas por el ISTQB (como partición de equivalencia, valores límite, transición de estados o tablas de equivalencia) y mostrando el flujo que siguió para pasar de caso de uso a caso de prueba"
       }
     }
   ]
 }
-If what is sent is not a use case, it returns a short warning, in this JSON schema:
+
+Si lo que se envía no es un caso de uso, responde con el siguiente esquema JSON en blanco, indicando que no se ha recibido un caso de uso válido:
+
+
 {
     "strResponse": ""
 }
-The response with which you fill in the parameters must be in Spanish, without changing the name of the attributes, limit your response to JSON, do not give more than necessary to be able to parse the response to a json after generation: Below, I send you the use case:
-`;
+La respuesta con la que rellenes los parámetros debe estar en español, sin cambiar el nombre de los atributos, limita tu respuesta a JSON, no des más de lo necesario para poder parsear la respuesta a un json tras la generación: A continuación os envío el caso de uso:`;

@@ -2,12 +2,12 @@ import {
   Injectable,
   NotFoundException,
   ConflictException,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { CreateTestCaseDto } from './dto/create-testcase.dto';
 import { UpdateTestCaseDto } from './dto/update-testcase.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Prisma } from '@prisma/client';
-import { CreateUseCaseDto } from 'src/usecases/dto/create-usecase.dto';
 import { UsecasesService } from 'src/usecases/usecases.service';
 import { IaService } from 'src/ia/ia.service';
 @Injectable()
@@ -18,13 +18,14 @@ export class TestcasesService {
     private readonly iaService: IaService,
   ) {}
 
-  async create(id: string) {
+  async generateTestCase(id: string) {
     try {
       console.log(id);
       const useCase = await this.usecasesService.findOne(id);
       if (!useCase) {
         throw new NotFoundException(`UseCase with id ${id} not found`);
       }
+
       const generatedTestCaseText = await this.iaService.getCompletion(useCase);
       const generatedTestCase2 = generatedTestCaseText
         .replace(/^```json/, '')
@@ -32,7 +33,6 @@ export class TestcasesService {
       console.log('Texto limpio:', generatedTestCase2); // Muestra el texto limpio
 
       // Parsear el texto plano generado a JSON
-      // console.log("hola",generatedTestCase2[1]);
       const generatedTestCase = JSON.parse(generatedTestCase2);
 
       if (
@@ -45,33 +45,10 @@ export class TestcasesService {
         );
       }
 
-      // Iterar sobre todos los casos de prueba generados
-      for (const testCaseData of generatedTestCase.testCases) {
-        // Verificar que lstInputs sea del tipo esperado (array o similar)
-        const inputDataArray = Array.isArray(testCaseData.lstInputs)
-          ? testCaseData.lstInputs
-          : Object.keys(testCaseData.lstInputs).map(
-              (key) => `${key}: ${testCaseData.lstInputs[key]}`,
-            );
-
-        // Crear cada test case en la base de datos usando Prisma
-        await this.prismaService.testCase.create({
-          data: {
-            code: testCaseData.strId,
-            name: testCaseData.strDescription,
-            steps: testCaseData.strSteps,
-            description: testCaseData.strDescription,
-            inputData: inputDataArray, 
-            expectedResult: JSON.stringify(testCaseData.lstPreconditions), // Igual con las precondiciones si es necesario
-            projectId: useCase.projectId,
-          },
-        });
-      }
+      // Retornar los casos de prueba generados sin guardarlos
       return {
-        message: 'Todos los casos de prueba se han creado exitosamente.',
+        generatedTestCases: generatedTestCase.testCases, // Solo devolvemos los casos generados
       };
-
-      // return generatedTestCase;
     } catch (error) {
       console.error(error);
 
@@ -85,7 +62,65 @@ export class TestcasesService {
       }
 
       // Re-lanzar el error si es otro
-      throw new Error('Error while creating TestCase: ' + error.message);
+      throw new Error('Error while generating TestCase: ' + error.message);
+    }
+  }
+
+  async create(createTestCaseDto: CreateTestCaseDto) {
+    try {
+      // Primero, creamos el TestCase
+      const testCase = await this.prismaService.testCase.create({
+        data: {
+          code: createTestCaseDto.code,
+          name: createTestCaseDto.name,
+          description: createTestCaseDto.description,
+          steps: createTestCaseDto.steps,
+          inputData: createTestCaseDto.inputData,
+          expectedResult: createTestCaseDto.expectedResult,
+          useCaseId: createTestCaseDto.useCaseId,
+        },
+      });
+
+      // Si se proporciona una explicación, creamos también la Explanation
+      if (
+        createTestCaseDto.explanationSummary &&
+        createTestCaseDto.explanationDetails
+      ) {
+        await this.prismaService.explanation.create({
+          data: {
+            summary: createTestCaseDto.explanationSummary,
+            details: createTestCaseDto.explanationDetails,
+            testCaseId: testCase.id, // Relacionamos la explicación con el TestCase recién creado
+          },
+        });
+      }
+
+      // Devuelve el TestCase creado (incluyendo la posible Explanation asociada)
+      return {
+        ...testCase,
+        explanation: createTestCaseDto.explanationSummary
+          ? {
+              summary: createTestCaseDto.explanationSummary,
+              details: createTestCaseDto.explanationDetails,
+            }
+          : null,
+      };
+    } catch (error) {
+      console.log(error);
+
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2002') {
+          // Conflicto de clave única (ej., si el nombre del TestCase ya existe)
+          throw new ConflictException(
+            `Test Case with name ${createTestCaseDto.name} already exists`,
+          );
+        }
+      }
+
+      // En caso de cualquier otro error, lanzamos una excepción genérica
+      throw new InternalServerErrorException(
+        'An error occurred while creating the TestCase',
+      );
     }
   }
 

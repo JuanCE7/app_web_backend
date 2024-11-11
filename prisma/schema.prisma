@@ -35,7 +35,6 @@ model Project {
   creatorId   String       
   creator     User         @relation(fields: [creatorId], references: [id], onDelete: Cascade)
   useCases    UseCase[]    @relation("ProjectUseCases")  
-  testCases   TestCase[]    @relation("ProjectTestCases")  
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
 }
@@ -49,6 +48,7 @@ model UseCase {
   postconditions  String
   mainFlow        String      
   alternateFlows  String?    
+  testCases       TestCase[]    @relation("UseCaseTestCases")  
   projectId       String
   project         Project    @relation("ProjectUseCases", fields: [projectId], references: [id], onDelete: Cascade)
   createdAt       DateTime   @default(now())
@@ -59,33 +59,23 @@ model TestCase {
   id              String             @id @default(uuid())
   code            String            
   name            String             
-  description     String             
+  description     String
   steps           String            
   inputData       String           
   expectedResult  String?           
-  projectId       String
-  project         Project             @relation("ProjectTestCases", fields: [projectId], references: [id], onDelete: Cascade) 
-  explanations    Explanation[]     @relation("TestCaseExplanation") 
+  useCaseId       String
+  useCase         UseCase             @relation("UseCaseTestCases", fields: [useCaseId], references: [id], onDelete: Cascade) 
+  explanation     Explanation?        @relation("TestCaseExplanation")
   createdAt       DateTime            @default(now())
   updatedAt       DateTime            @updatedAt
 }
 
 model Explanation {
-  id            String      @id @default(uuid())
-  analyzedText  String      
-  keywords      String   
-  explanation   String  
-  type          AnalysisType 
-  testCaseId    String
-  testCase      TestCase    @relation("TestCaseExplanation", fields: [testCaseId], references: [id], onDelete: Cascade) 
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
-}
-
-enum AnalysisType {
-  Description
-  Preconditions
-  Steps
-  InputData
-  ExpectedResult
+  id          String    @id @default(uuid())
+  summary     String
+  details     String
+  testCaseId  String    @unique            
+  testCase    TestCase  @relation("TestCaseExplanation", fields: [testCaseId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
