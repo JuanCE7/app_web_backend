@@ -23,11 +23,11 @@ export class TestcasesController {
     return this.testcasesService.create(createTestCaseDto);
   }
 
-  @Get()
+  @Get(':useCaseId')
   @ApiOperation({ summary : 'Get testcases'})
   @ApiResponse({status: 200, description : 'The testcases has been successfully returned'})
-  findAll() {
-    return this.testcasesService.findAll();
+  findAll(@Param('useCaseId') useCaseId: string) {
+    return this.testcasesService.findAll(useCaseId);
   }
 
   @Get(':id')

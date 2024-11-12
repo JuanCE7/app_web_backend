@@ -16,7 +16,7 @@ export class UsecasesController {
     return this.usecasesService.create(CreateUseCaseDto);
   }
 
-  @Get(':userId')
+  @Get(':projectId')
   @ApiOperation({ summary : 'Get usecases'})
   @ApiResponse({status: 200, description : 'The usecases haS been successfully returned'})
   findAll(@Param('projectId') projectId: string) {

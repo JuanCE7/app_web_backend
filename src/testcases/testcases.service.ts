@@ -124,8 +124,15 @@ export class TestcasesService {
     }
   }
 
-  findAll() {
-    return this.prismaService.testCase.findMany();
+  findAll(useCaseId: string) {
+    return this.prismaService.testCase.findMany({
+      where: {
+        useCaseId: useCaseId,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
   }
 
   async findOne(id: string) {
@@ -139,19 +146,34 @@ export class TestcasesService {
     return testCaseFound;
   }
 
-  async update(id: string, updateTestcaseDto: UpdateTestCaseDto) {
-    const testCaseUpdate = await this.prismaService.testCase.update({
-      where: {
-        id: id,
-      },
-      data: updateTestcaseDto,
-    });
+  // Actualizar un testCase existente
+  async update(id: string, updateTestCaseDto: UpdateTestCaseDto) {
+    try {
+      const testCaseUpdate = await this.prismaService.testCase.update({
+        where: { id },
+        data: {
+          code: updateTestCaseDto.code,
+          name: updateTestCaseDto.name,
+          description: updateTestCaseDto.description,
+          inputData: updateTestCaseDto.inputData,
+          expectedResult: updateTestCaseDto.expectedResult,
+          steps: updateTestCaseDto.steps,
+        },
+      });
 
-    if (!testCaseUpdate) {
-      throw new NotFoundException(`TestCase with id ${id} not found`);
+      if (!testCaseUpdate) {
+        throw new NotFoundException(`TestCase with id ${id} not found`);
+      }
+
+      return testCaseUpdate;
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2025') {
+          throw new NotFoundException(`TestCase with id ${id} not found`);
+        }
+      }
+      throw error;
     }
-
-    return testCaseUpdate;
   }
 
   async remove(id: string) {
