@@ -140,7 +140,7 @@ export class TestcasesService {
       where: { id: id },
     });
     if (!testCaseFound) {
-      throw new NotFoundException(`TestCase with id ${id} not found`);
+      throw new NotFoundException(`Test Case with id ${id} not found`);
     }
 
     return testCaseFound;

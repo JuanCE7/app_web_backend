@@ -30,7 +30,7 @@ export class TestcasesController {
     return this.testcasesService.findAll(useCaseId);
   }
 
-  @Get(':id')
+  @Get('/testcase/:id')
   @ApiOperation({ summary : 'Get a testcase'})
   @ApiResponse({status: 200, description : 'A testcase has been successfully returned'})
   findOne(@Param('id') id: string) {
