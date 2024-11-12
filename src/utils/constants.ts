@@ -11,10 +11,8 @@ El esquema JSON del caso de prueba funcional debe tener el siguiente formato:
       "steps": "Secuencia de pasos (en formato de string) que el usuario debe seguir para ejecutar el caso de prueba. Cada paso debe ser claro y conciso, explicando la interacción específica con el sistema.",
       "inputData": "Datos de entrada necesarios (en formato de string) para realizar el caso de prueba, como campos de formularios o valores de parámetros proporcionados por el usuario.",
       "expectedResult": "El resultado esperado después de ejecutar el caso de prueba. Debe describir el comportamiento o salida que el sistema debe mostrar si funciona correctamente.",
-      "explanation": {
-        "summary": "Un resumen de alto nivel que describe la naturaleza del caso de uso que se está analizando y cómo se generó el caso de prueba.",
-        "details": "Explicación detallada de alto nivel que describe el proceso de transformación de caso de uso a caso de prueba, haciendo referencia a técnicas específicas recomendadas por el ISTQB (como partición de equivalencia, valores límite, transición de estados o tablas de equivalencia) y mostrando el flujo que siguió para pasar de caso de uso a caso de prueba"
-      }
+      "explanationSummary": "Un resumen de alto nivel que describe la naturaleza del caso de uso que se está analizando y cómo se generó el caso de prueba.",
+      "explanationDetails": "Explicación detallada de alto nivel que describe el proceso de transformación de caso de uso a caso de prueba, haciendo referencia a técnicas específicas recomendadas por el ISTQB (como partición de equivalencia, valores límite, transición de estados o tablas de equivalencia) y mostrando el flujo que siguió para pasar de caso de uso a caso de prueba"      
     }
   ]
 }
