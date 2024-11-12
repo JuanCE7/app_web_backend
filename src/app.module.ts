@@ -6,6 +6,7 @@ import { TestcasesModule } from './testcases/testcases.module';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { IaModule } from './ia/ia.module';
+import { ExplanationModule } from './explanation/explanation.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { IaModule } from './ia/ia.module';
     AuthModule,
     UsersModule,
     IaModule,
+    ExplanationModule,
   ],
   controllers: [],
   providers: [PrismaService],
