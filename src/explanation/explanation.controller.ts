@@ -19,7 +19,7 @@ export class ExplanationController {
   //   return this.explanationService.findAll();
   // }
 
-  @Get('/explanation/:id')
+  @Get(':id')
   @ApiOperation({ summary : 'Get a explanation'})
   @ApiResponse({status: 200, description : 'A explanation has been successfully returned'})
   findOne(@Param('id') id: string) {
