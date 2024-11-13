@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+} from '@nestjs/common';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -8,55 +12,61 @@ import { v4 as uuidv4 } from 'uuid';
 @Injectable()
 export class ProjectsService {
   constructor(private prismaService: PrismaService) {}
-  
+
   async create(createProjectDto: CreateProjectDto) {
     try {
-      
+      // Generar un código único para el proyecto
       let code;
       let codeExists = true;
-  
       while (codeExists) {
         code = uuidv4().split('-')[0].slice(0, 8);
-        codeExists = await this.prismaService.project.findUnique({
-          where: { code },
-        }) !== null;
-      }  
-      const image = createProjectDto.image ? createProjectDto.image : '';
+        codeExists =
+          (await this.prismaService.project.findUnique({
+            where: { code },
+          })) !== null;
+      }
 
-      return await this.prismaService.project.create({
+      const project = await this.prismaService.project.create({
         data: {
-          code, 
+          code,
           name: createProjectDto.name,
           description: createProjectDto.description,
-          image: image,
-          creator: {
-            connect: { id: createProjectDto.creatorId },
+          image: createProjectDto.image || '',
+          members: {
+            create: {
+              userId: createProjectDto.userId,
+              role: 'Owner',
+            },
           },
         },
+        include: {
+          members: true,
+        },
       });
+
+      return project;
     } catch (error) {
-      console.log(error);
-      if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        if (error.code === 'P2002') {
-          throw new ConflictException(
-            `Project with name ${createProjectDto.name} already exists`,
-          );
-        }
-      }
-      throw error;
+      console.error(error);
+      throw new Error('Error creating project');
     }
   }
 
-  // Obtener todos los proyectos
-  findAll(userId: string) {
-    return this.prismaService.project.findMany({
-      where: {
-        creatorId: userId,
-      },
-      orderBy: {
-        createdAt: 'desc', // Ordena por la fecha de creación en orden descendente
-      },
-    });
+  async findAll(userId: string) {
+    try {
+      const projects = await this.prismaService.projectMember.findMany({
+        where: {
+          userId,
+        },
+        include: {
+          project: true,
+        },
+      });
+  
+      return projects.map(member => member.project);
+    } catch (error) {
+      console.error('Error fetching user projects:', error);
+      throw new Error('Could not fetch user projects');
+    }
   }
 
   // Obtener un proyecto por ID
@@ -110,7 +120,10 @@ export class ProjectsService {
 
       return deletedProject;
     } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2025'
+      ) {
         throw new NotFoundException(`Project with id ${id} not found`);
       }
       throw error;

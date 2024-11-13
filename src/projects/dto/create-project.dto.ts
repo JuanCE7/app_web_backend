@@ -12,5 +12,5 @@ export class CreateProjectDto {
   image?: string; 
 
   @IsString()
-  creatorId: string;
+  userId: string;
 }

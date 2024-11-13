@@ -2,7 +2,7 @@
 CREATE TYPE "Roles" AS ENUM ('Tester', 'Administrator');
 
 -- CreateEnum
-CREATE TYPE "AnalysisType" AS ENUM ('Description', 'Preconditions', 'Steps', 'InputData', 'ExpectedResult');
+CREATE TYPE "ProjectRoles" AS ENUM ('Owner', 'Editor', 'Viewer');
 
 -- CreateTable
 CREATE TABLE "User" (
@@ -13,6 +13,7 @@ CREATE TABLE "User" (
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
     "role" "Roles" NOT NULL DEFAULT 'Tester',
+    "image" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -22,15 +23,26 @@ CREATE TABLE "User" (
 -- CreateTable
 CREATE TABLE "Project" (
     "id" TEXT NOT NULL,
-    "projectCode" TEXT NOT NULL,
+    "code" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "description" TEXT,
     "image" TEXT,
-    "creatorId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "Project_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "ProjectMember" (
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "projectId" TEXT NOT NULL,
+    "role" "ProjectRoles" NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "ProjectMember_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -59,7 +71,7 @@ CREATE TABLE "TestCase" (
     "steps" TEXT NOT NULL,
     "inputData" TEXT NOT NULL,
     "expectedResult" TEXT,
-    "projectId" TEXT NOT NULL,
+    "useCaseId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -69,10 +81,8 @@ CREATE TABLE "TestCase" (
 -- CreateTable
 CREATE TABLE "Explanation" (
     "id" TEXT NOT NULL,
-    "analyzedText" TEXT NOT NULL,
-    "keywords" TEXT NOT NULL,
-    "explanation" TEXT NOT NULL,
-    "type" "AnalysisType" NOT NULL,
+    "summary" TEXT NOT NULL,
+    "details" TEXT NOT NULL,
     "testCaseId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -84,16 +94,25 @@ CREATE TABLE "Explanation" (
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Project_projectCode_key" ON "Project"("projectCode");
+CREATE UNIQUE INDEX "Project_code_key" ON "Project"("code");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "ProjectMember_userId_projectId_key" ON "ProjectMember"("userId", "projectId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Explanation_testCaseId_key" ON "Explanation"("testCaseId");
 
 -- AddForeignKey
-ALTER TABLE "Project" ADD CONSTRAINT "Project_creatorId_fkey" FOREIGN KEY ("creatorId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "ProjectMember" ADD CONSTRAINT "ProjectMember_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ProjectMember" ADD CONSTRAINT "ProjectMember_projectId_fkey" FOREIGN KEY ("projectId") REFERENCES "Project"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "UseCase" ADD CONSTRAINT "UseCase_projectId_fkey" FOREIGN KEY ("projectId") REFERENCES "Project"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "TestCase" ADD CONSTRAINT "TestCase_projectId_fkey" FOREIGN KEY ("projectId") REFERENCES "Project"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "TestCase" ADD CONSTRAINT "TestCase_useCaseId_fkey" FOREIGN KEY ("useCaseId") REFERENCES "UseCase"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Explanation" ADD CONSTRAINT "Explanation_testCaseId_fkey" FOREIGN KEY ("testCaseId") REFERENCES "TestCase"("id") ON DELETE CASCADE ON UPDATE CASCADE;
