@@ -3,6 +3,7 @@ import { ProjectsService } from './projects.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ShareProjectDto } from './dto/share-project.dto';
 
 @ApiTags('projects')
 @Controller('projects')
@@ -14,6 +15,13 @@ export class ProjectsController {
   @ApiResponse({status: 200, description : 'A project has been successfully created'})
   create(@Body() createProjectDto: CreateProjectDto) {
     return this.projectsService.create(createProjectDto);
+  }
+
+  @Post("/shareProject")
+  @ApiOperation({ summary : 'Shared a project'})
+  @ApiResponse({status: 200, description : 'A project has been successfully created'})
+  shareProject(@Body() shareProjectDto: ShareProjectDto ) {
+    return this.projectsService.shareProject(shareProjectDto);
   }
 
   @Get(':userId')
