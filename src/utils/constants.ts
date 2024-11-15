@@ -17,10 +17,9 @@ El esquema JSON del caso de prueba funcional debe tener el siguiente formato:
   ]
 }
 
-Si lo que se envía no es un caso de uso, responde con el siguiente esquema JSON en blanco, indicando que no se ha recibido un caso de uso válido:
-
+Si lo que se envía no es un caso de uso, responde con el siguiente esquema JSON, indicando que no se ha recibido un caso de uso válido:
 
 {
-    "strResponse": ""
+    "strResponse": "caso de uso no válido"
 }
 La respuesta con la que rellenes los parámetros debe estar en español, sin cambiar el nombre de los atributos, limita tu respuesta a JSON, no des más de lo necesario para poder parsear la respuesta a un json tras la generación: A continuación os envío el caso de uso:`;

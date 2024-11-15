@@ -28,11 +28,11 @@ export class TestcasesService {
 
       const generatedTestCaseText = await this.iaService.getCompletion(useCase);
       const generatedTestCase2 = generatedTestCaseText
-        .replace(/^```json/, '')
-        .replace(/```$/, '');
-      console.log('Texto limpio:', generatedTestCase2); // Muestra el texto limpio
+        .trim()
+        .replace(/^```json\s*/, '')
+        .replace(/```$/, '')
+        .trim();
 
-      // Parsear el texto plano generado a JSON
       const generatedTestCase = JSON.parse(generatedTestCase2);
 
       if (
