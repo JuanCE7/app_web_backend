@@ -45,6 +45,7 @@ export class UsersService {
         firstName: true,
         lastName: true,
         role: true,
+        status: true,
       },
     });
   }
@@ -68,43 +69,43 @@ export class UsersService {
   }
 
   // Actualizar usuario
-async updateProfileUser(id: string, updateUserDto: UpdateUserDto) {
-  // Desestructuramos solo los campos que se deben actualizar
-  const { firstName, lastName, email, image, password } = updateUserDto;
+  async updateProfileUser(id: string, updateUserDto: UpdateUserDto) {
+    // Desestructuramos solo los campos que se deben actualizar
+    const { firstName, lastName, email, image, password } = updateUserDto;
 
-  // Creamos un objeto con los datos que vamos a actualizar
-  const userDataToUpdate: any = {};
+    // Creamos un objeto con los datos que vamos a actualizar
+    const userDataToUpdate: any = {};
 
-  // Solo actualizamos la contraseña si se proporciona una nueva
-  if (password) {
-    userDataToUpdate.password = await bcrypt.hash(password, 10);
-  }
-
-  // Si se proporcionan los demás campos, los agregamos al objeto de actualización
-  if (firstName) userDataToUpdate.firstName = firstName;
-  if (lastName) userDataToUpdate.lastName = lastName;
-  if (email) userDataToUpdate.email = email;
-  if (image) userDataToUpdate.image = image;
-
-  try {
-    // Realizamos la actualización solo con los campos que fueron modificados
-    const updatedUser = await this.prisma.user.update({
-      where: { id },
-      data: userDataToUpdate,
-    });
-
-    // Retornamos la respuesta con el usuario actualizado
-    return { user: updatedUser };
-  } catch (error) {
-    if (
-      error instanceof Prisma.PrismaClientKnownRequestError &&
-      error.code === 'P2025'
-    ) {
-      throw new NotFoundException(`User with id ${id} not found`);
+    // Solo actualizamos la contraseña si se proporciona una nueva
+    if (password) {
+      userDataToUpdate.password = await bcrypt.hash(password, 10);
     }
-    throw error;
+
+    // Si se proporcionan los demás campos, los agregamos al objeto de actualización
+    if (firstName) userDataToUpdate.firstName = firstName;
+    if (lastName) userDataToUpdate.lastName = lastName;
+    if (email) userDataToUpdate.email = email;
+    if (image) userDataToUpdate.image = image;
+
+    try {
+      // Realizamos la actualización solo con los campos que fueron modificados
+      const updatedUser = await this.prisma.user.update({
+        where: { id },
+        data: userDataToUpdate,
+      });
+
+      // Retornamos la respuesta con el usuario actualizado
+      return { user: updatedUser };
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2025'
+      ) {
+        throw new NotFoundException(`User with id ${id} not found`);
+      }
+      throw error;
+    }
   }
-}
 
   // Método para encontrar un usuario por email
   async findByEmail(email: string) {
@@ -115,5 +116,33 @@ async updateProfileUser(id: string, updateUserDto: UpdateUserDto) {
       return null;
     }
     return user;
+  }
+  // Actualizar usuario
+  async updateUser(id: string, updateUserDto: UpdateUserDto) {
+    try {
+      const userUpdate = await this.prisma.user.update({
+        where: { id },
+        data: {
+          firstName: updateUserDto.firstName,
+          lastName: updateUserDto.lastName,
+          email: updateUserDto.email,
+          role: updateUserDto.role,
+          status: updateUserDto.status,
+        },
+      });
+
+      if (!userUpdate) {
+        throw new NotFoundException(`User with id ${id} not found`);
+      }
+
+      return userUpdate;
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2025') {
+          throw new NotFoundException(`User with id ${id} not found`);
+        }
+      }
+      throw error;
+    }
   }
 }

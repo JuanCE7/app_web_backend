@@ -45,4 +45,11 @@ export class UsersController {
   async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.updateProfileUser(id, updateUserDto);
   }
+
+  @Patch('/admin/:id')
+  @ApiOperation({ summary : 'Update a user'})
+  @ApiResponse({status: 200, description : 'A user has been successfully updated'})
+  async updateUser(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+    return this.usersService.updateUser(id, updateUserDto);
+  }
 }
