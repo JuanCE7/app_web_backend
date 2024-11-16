@@ -10,6 +10,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { Prisma, ProjectRoles } from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
 import { ShareProjectDto } from './dto/share-project.dto';
+import { ExitProjectDto } from './dto/exit-project.dto';
 
 @Injectable()
 export class ProjectsService {
@@ -197,6 +198,48 @@ export class ProjectsService {
     }
   }
 
+  async exitProject(exitProjectDto: ExitProjectDto) {
+    try {
+      // Verificar si la relación existe antes de intentar eliminarla
+      const membership = await this.prismaService.projectMember.findUnique({
+        where: {
+          userId_projectId: {
+            userId: exitProjectDto.userId,
+            projectId: exitProjectDto.projectId,
+          },
+        },
+      });
+  
+      if (!membership) {
+        throw new NotFoundException(`User with id ${exitProjectDto.userId} is not a member of project with id ${exitProjectDto.projectId}`);
+      }
+  
+      // Eliminar la relación en la tabla projectMember
+      await this.prismaService.projectMember.delete({
+        where: {
+          userId_projectId: {
+            userId: exitProjectDto.userId,
+            projectId: exitProjectDto.projectId,
+          },
+        },
+      });
+  
+      return {
+        success: true,
+        message: `User with id ${exitProjectDto.userId} successfully removed from project with id ${exitProjectDto.projectId}`,
+      };
+    } catch (error) {
+      // Manejo de errores de Prisma
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2025') {
+          throw new NotFoundException(`Membership not found`);
+        }
+      }
+      console.error('Error removing project member:', error);
+      throw new InternalServerErrorException('An error occurred while removing the project member');
+    }
+  }
+  
   // Obtener un proyecto por ID
   async findOne(id: string) {
     const projectFound = await this.prismaService.project.findUnique({
