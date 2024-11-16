@@ -26,12 +26,20 @@ export class TestcasesService {
         throw new NotFoundException(`UseCase with id ${id} not found`);
       }
 
+      const cleanResponse = (response: string): string => {
+        // Utiliza una expresión regular para extraer el contenido entre `{` y `}`
+        const jsonMatch = response.match(/{[\s\S]*}/);
+        if (jsonMatch) {
+          return jsonMatch[0]; // Devuelve el contenido JSON extraído
+        } else {
+          throw new Error('No se encontró un bloque JSON válido en la respuesta');
+        }
+      };
+
       const generatedTestCaseText = await this.iaService.getCompletion(useCase);
-      const generatedTestCase2 = generatedTestCaseText
-        .trim()
-        .replace(/^```json\s*/, '')
-        .replace(/```$/, '')
-        .trim();
+      const generatedTestCase2 = cleanResponse(generatedTestCaseText);
+      
+      console.log(generatedTestCase2)
 
       const generatedTestCase = JSON.parse(generatedTestCase2);
 

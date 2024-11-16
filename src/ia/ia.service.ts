@@ -1,34 +1,32 @@
 import { Injectable } from '@nestjs/common';
-import { GoogleGenerativeAI } from '@google/generative-ai';
-import { api_key, prompt as prompt } from '../utils/constants';
 import { Usecase } from 'src/usecases/entities/usecase.entity';
+import { prompt, api_key } from '../utils/constants';
+import { CohereClient } from "cohere-ai";
+
+const cohere = new CohereClient({
+  token: api_key,
+});
 @Injectable()
 export class IaService {
-  private genAI: GoogleGenerativeAI;
-  private model: any;
-
-  constructor() {
-    this.genAI = new GoogleGenerativeAI(api_key);
-    this.model = this.genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
-  }
 
   async getCompletion(useCaseData: Partial<Usecase>) {
+    const useCaseJson = JSON.stringify(useCaseData, null, 2);
+    const promptData = `${prompt} \n${useCaseJson}`;
+
     try {
-      const useCaseJson = JSON.stringify(useCaseData, null, 2);
-      const promptData = `${prompt} \n${useCaseJson}`;
-
-      console.log('Prompt enviado a la IA:', promptData);
-      console.log(useCaseData);
-      const result = await this.model.generateContent(promptData);
-
-      const responseText = result.response.text();
-
-      return responseText;
+      const response = await cohere.v2.chat({
+        model: 'command-r',
+        messages: [
+          {
+            role: 'user',
+            content: promptData,
+          },
+        ],
+      });
+      return response.message.content[0].text
     } catch (error) {
-      console.error('Error en getCompletion:', error);
-      throw new Error(
-        'No se pudo obtener una respuesta de la API de Google Generative AI',
-      );
+      console.error('Error al llamar a la API de Cohere:', error);
+      throw new Error('Error al obtener respuesta de Cohere AI');
     }
   }
 }

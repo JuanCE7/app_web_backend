@@ -1,6 +1,6 @@
 export const jwtSecret = process.env.JWT_SECRET;
-export const api_key = process.env.GOOGLE_GENAI_API_KEY;
-export const prompt = `Actúa como un ingeniero de software especializado en el diseño de casos de prueba funcionales. Te proporcionaré un caso de uso en formato JSON. Analiza este caso de uso para determinar un conjunto de casos de prueba funcionales basados en este esquema JSON, generando tantos casos de prueba funcionales como sea posible. En la explanation, detalla paso a paso cómo llegaste a esa propuesta.
+export const api_key = process.env.API_KEY;
+export const prompt = `Actúa como un ingeniero de software especializado en Pruebas de software, especificamente en el diseño de casos de prueba funcionales. Te proporcionaré un caso de uso en formato JSON. Analiza este caso de uso para determinar un conjunto de casos de prueba funcionales basados en este esquema JSON, generando tantos casos de prueba funcionales como sea posible, basandote en técnicas como partición de equivalencia, valores límite, transición de estados o tablas de decisión; requiero que internamente, hagas este proceso 3 veces, evalues los casos de prueba funcionales que generes y me devuelvas los mejores.
 El esquema JSON del caso de prueba funcional debe tener el siguiente formato:
 {
   "testCases": [
@@ -12,7 +12,7 @@ El esquema JSON del caso de prueba funcional debe tener el siguiente formato:
       "inputData": "Datos de entrada necesarios (en formato de string) para realizar el caso de prueba, como campos de formularios o valores de parámetros proporcionados por el usuario.",
       "expectedResult": "El resultado esperado después de ejecutar el caso de prueba. Debe describir el comportamiento o salida que el sistema debe mostrar si funciona correctamente.",
       "explanationSummary": "Un resumen de alto nivel que describe la naturaleza del caso de uso que se está analizando y cómo se generó el caso de prueba.",
-      "explanationDetails": "Explicación detallada de alto nivel que describe el proceso de transformación de caso de uso a caso de prueba, haciendo referencia a técnicas específicas recomendadas por el ISTQB (como partición de equivalencia, valores límite, transición de estados o tablas de equivalencia) y mostrando el flujo que siguió para pasar de caso de uso a caso de prueba"      
+      "explanationDetails": "Explicación detallada de alto nivel que describe el proceso de transformación de caso de uso a caso de prueba, haciendo referencia a técnicas específicas recomendadas por el ISTQB (como partición de equivalencia, valores límite, transición de estados o tablas de decisión) y mostrando el flujo que siguió para pasar de caso de uso a caso de prueba"      
     }
   ]
 }
