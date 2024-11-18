@@ -3,7 +3,7 @@ import {
   NotFoundException,
   ConflictException,
 } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto'; // Asegúrate de tener los DTOs definidos
+import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import * as bcrypt from 'bcryptjs';
 import { Prisma } from '@prisma/client';
@@ -14,16 +14,42 @@ export class UsersService {
   constructor(private prisma: PrismaService) {}
 
   async createUser(createUserDto: CreateUserDto) {
-    const { password, ...userData } = createUserDto;
+    const { password, firstName, lastName, email, role, ...userData } =
+      createUserDto;
     const hashedPassword = await bcrypt.hash(password, 10);
 
     try {
+      // Buscar el rol por nombre
+      const roleRecord = await this.prisma.role.findUnique({
+        where: { name: role },
+      });
+
+      if (!roleRecord) {
+        throw new NotFoundException(`Role ${role} not found`);
+      }
+
+      // Crear el usuario junto con la entidad
       const newUser = await this.prisma.user.create({
         data: {
-          ...userData,
+          email: email,
           password: hashedPassword,
+          status: true,
+          role: {
+            connect: { id: roleRecord.id },
+          },
+          entity: {
+            create: {
+              firstName,
+              lastName,
+            },
+          },
+        },
+        include: {
+          entity: true,
+          role: true,
         },
       });
+
       return { user: newUser };
     } catch (error) {
       if (
@@ -36,30 +62,45 @@ export class UsersService {
     }
   }
 
-  // Obtener todos los usuarios
   async getUsers() {
     return this.prisma.user.findMany({
       select: {
         id: true,
         email: true,
-        firstName: true,
-        lastName: true,
-        role: true,
         status: true,
+        entity: {
+          select: {
+            firstName: true,
+            lastName: true,
+          },
+        },
+        role: {
+          select: {
+            name: true,
+          },
+        },
       },
     });
   }
 
-  // Obtener un usuario por id
   async getUserById(id: string) {
     const user = await this.prisma.user.findUnique({
       where: { id },
       select: {
         email: true,
-        firstName: true,
-        lastName: true,
-        password: true,
-        role: true,
+        status: true,
+        entity: {
+          select: {
+            firstName: true,
+            lastName: true,
+            imageEntity: true,
+          },
+        },
+        role: {
+          select: {
+            name: true,
+          },
+        },
       },
     });
     if (!user) {
@@ -68,33 +109,36 @@ export class UsersService {
     return { user };
   }
 
-  // Actualizar usuario
   async updateProfileUser(id: string, updateUserDto: UpdateUserDto) {
-    // Desestructuramos solo los campos que se deben actualizar
     const { firstName, lastName, email, image, password } = updateUserDto;
 
-    // Creamos un objeto con los datos que vamos a actualizar
     const userDataToUpdate: any = {};
+    const entityDataToUpdate: any = {};
 
-    // Solo actualizamos la contraseña si se proporciona una nueva
     if (password) {
       userDataToUpdate.password = await bcrypt.hash(password, 10);
     }
 
-    // Si se proporcionan los demás campos, los agregamos al objeto de actualización
-    if (firstName) userDataToUpdate.firstName = firstName;
-    if (lastName) userDataToUpdate.lastName = lastName;
     if (email) userDataToUpdate.email = email;
-    if (image) userDataToUpdate.image = image;
+    if (firstName) entityDataToUpdate.firstName = firstName;
+    if (lastName) entityDataToUpdate.lastName = lastName;
+    if (image) entityDataToUpdate.imageEntity = image;
 
     try {
-      // Realizamos la actualización solo con los campos que fueron modificados
       const updatedUser = await this.prisma.user.update({
         where: { id },
-        data: userDataToUpdate,
+        data: {
+          ...userDataToUpdate,
+          entity: {
+            update: entityDataToUpdate,
+          },
+        },
+        include: {
+          entity: true,
+          role: true,
+        },
       });
 
-      // Retornamos la respuesta con el usuario actualizado
       return { user: updatedUser };
     } catch (error) {
       if (
@@ -107,27 +151,44 @@ export class UsersService {
     }
   }
 
-  // Método para encontrar un usuario por email
   async findByEmail(email: string) {
     const user = await this.prisma.user.findUnique({
       where: { email },
+      include: {
+        entity: true,
+        role: true,
+      },
     });
     if (!user) {
       return null;
     }
     return user;
   }
-  // Actualizar usuario
+
   async updateUser(id: string, updateUserDto: UpdateUserDto) {
+    const { firstName, lastName, email, role, status } = updateUserDto;
+
     try {
       const userUpdate = await this.prisma.user.update({
         where: { id },
         data: {
-          firstName: updateUserDto.firstName,
-          lastName: updateUserDto.lastName,
-          email: updateUserDto.email,
-          role: updateUserDto.role,
-          status: updateUserDto.status,
+          email,
+          status,
+          entity: {
+            update: {
+              firstName,
+              lastName,
+            },
+          },
+          role: role
+            ? {
+                connect: { name: role },
+              }
+            : undefined,
+        },
+        include: {
+          entity: true,
+          role: true,
         },
       });
 

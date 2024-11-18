@@ -18,7 +18,6 @@ export class AuthService {
   ) {}
 
   private revokedTokens: Set<string> = new Set();
-
   
   revokeToken(token: string) {
     this.revokedTokens.add(token);
@@ -81,7 +80,7 @@ export class AuthService {
     return {
       token,
       email,
-      role: user.role,
+      role: user.role.name,
     };
   }
   

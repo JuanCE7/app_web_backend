@@ -151,16 +151,11 @@ export class ProjectsService {
             user: {
               select: {
                 id: true,
-                email: true,
-                firstName: true,
-                lastName: true,
               },
             },
             project: {
               select: {
                 id: true,
-                name: true,
-                code: true,
               },
             },
           },

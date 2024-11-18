@@ -7,9 +7,37 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Roles {
-  Tester
-  Administrator
+model Entity {
+  id            String  @id @default(uuid())
+  firstName     String
+  lastName      String
+  imageEntity   String?
+  user          User?
+}
+
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  password      String
+  status        Boolean   @default(true)
+  entityId      String    @unique
+  entity        Entity    @relation(fields: [entityId], references: [id])
+  roleId        String
+  role          Role      @relation(fields: [roleId], references: [id])
+  projects      ProjectMember[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+enum Roles { 
+  Tester 
+  Administrator 
+}
+
+model Role {
+  id    String @id @default(uuid())
+  name  Roles @unique
+  users User[]
 }
 
 enum ProjectRoles {
@@ -18,43 +46,29 @@ enum ProjectRoles {
   Viewer
 }
 
-model User {
-  id          String      @id @default(uuid())
-  status      Boolean     @default(true)
-  firstName   String  
-  lastName    String
-  email       String      @unique
-  password    String
-  role        Roles       @default(Tester) 
-  image       String?
-  projects    ProjectMember[]
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-}
-
 model Project {
   id          String      @id @default(uuid())
   code        String      @unique
   name        String
   description String?
   image       String?
-  useCases    UseCase[]    @relation("ProjectUseCases")  
+  useCases    UseCase[]   @relation("ProjectUseCases")  
   members     ProjectMember[]
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
 }
 
 model ProjectMember {
-  id         String        @id @default(uuid())
+  id         String       @id @default(uuid())
   userId     String
-  user       User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user       User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   projectId  String
-  project    Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  role       ProjectRoles  // Enum para roles dentro del proyecto
-  createdAt  DateTime      @default(now())
-  updatedAt  DateTime      @updatedAt
+  project    Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  role       ProjectRoles
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
 
-  @@unique([userId, projectId]) // Un usuario solo puede tener un rol por proyecto
+  @@unique([userId, projectId])
 }
 
 model UseCase {
@@ -66,7 +80,7 @@ model UseCase {
   postconditions  String
   mainFlow        String      
   alternateFlows  String?    
-  testCases       TestCase[]    @relation("UseCaseTestCases")  
+  testCases       TestCase[] @relation("UseCaseTestCases")  
   projectId       String
   project         Project    @relation("ProjectUseCases", fields: [projectId], references: [id], onDelete: Cascade)
   createdAt       DateTime   @default(now())
@@ -74,7 +88,7 @@ model UseCase {
 }
 
 model TestCase {
-  id              String             @id @default(uuid())
+  id              String      @id @default(uuid())
   code            String            
   name            String             
   description     String
@@ -82,10 +96,10 @@ model TestCase {
   inputData       String           
   expectedResult  String?           
   useCaseId       String
-  useCase         UseCase             @relation("UseCaseTestCases", fields: [useCaseId], references: [id], onDelete: Cascade) 
-  explanation     Explanation?        @relation("TestCaseExplanation")
-  createdAt       DateTime            @default(now())
-  updatedAt       DateTime            @updatedAt
+  useCase         UseCase     @relation("UseCaseTestCases", fields: [useCaseId], references: [id], onDelete: Cascade) 
+  explanation     Explanation?@relation("TestCaseExplanation")
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
 }
 
 model Explanation {

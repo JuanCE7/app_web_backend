@@ -1,8 +1,9 @@
 import { Roles } from '@prisma/client';
 import { Transform } from 'class-transformer';
-import { IsEmail, IsOptional, IsString, MinLength } from 'class-validator';
+import { IsBoolean, IsEmail, IsOptional, IsString, MinLength } from 'class-validator';
 
 export class CreateUserDto {
+  // Campos para la entidad
   @IsString({ message: 'El nombre es obligatorio y debe ser un texto.' })
   @MinLength(3, { message: 'El nombre debe tener al menos 3 caracteres.' })
   firstName: string;
@@ -10,9 +11,10 @@ export class CreateUserDto {
   @IsString({ message: 'El apellido es obligatorio y debe ser un texto.' })
   @MinLength(3, { message: 'El apellido debe tener al menos 3 caracteres.' })
   lastName: string;
-  
+
+  // Campos para el usuario
   @IsOptional()
-  image: string;
+  image?: string;
 
   @IsEmail({}, { message: 'Debe proporcionar un correo electrónico válido.' })
   email: string;
@@ -25,6 +27,7 @@ export class CreateUserDto {
   @IsString({ message: 'El rol es obligatorio.' })
   role: Roles;
 
-  @IsOptional({ message: 'El estado es obligatorio.' })
-  status: boolean;
+  @IsOptional()
+  @IsBoolean({ message: 'El estado debe ser un valor booleano.' })
+  status?: boolean;
 }
