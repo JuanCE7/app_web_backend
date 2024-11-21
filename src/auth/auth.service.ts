@@ -11,7 +11,7 @@ import { RegisterUserDto } from './dto/register.dto';
 import { Roles } from '@prisma/client';
 import * as fs from 'fs';
 import * as path from 'path';
-import { transporter } from './mailer';
+import { transporter } from '../utils/mailer';
 import { VerifyOtpDto } from './dto/verifyOtp.dto';
 
 @Injectable()
@@ -37,6 +37,7 @@ export class AuthService {
   }
 
   async register({ firstName, lastName, email, password }: RegisterUserDto) {
+    console.log(firstName,lastName,email,password)
     const user = await this.usersService.findByEmail(email);
     if (user) {
       throw new BadRequestException('User already exists');
@@ -149,12 +150,12 @@ export class AuthService {
   async login({ email, password }: LoginDto) {
     const user = await this.usersService.findByEmail(email);
     if (!user) {
-      throw new UnauthorizedException('email is wrong');
+      throw new UnauthorizedException('Correo incorrecto');
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      throw new UnauthorizedException('password is wrong');
+      throw new UnauthorizedException('Contraseña incorrecta');
     }
 
     const payload = { email: user.email, role: user.role };
