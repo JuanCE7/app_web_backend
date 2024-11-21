@@ -25,7 +25,6 @@ export class IaService {
       });
       return response.message.content[0].text
     } catch (error) {
-      console.error('Error al llamar a la API de Cohere:', error);
       throw new Error('Error al obtener respuesta de Cohere AI');
     }
   }

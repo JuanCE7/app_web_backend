@@ -32,7 +32,6 @@ export class UsecasesService {
         ...useCase,
       };
     } catch (error) {
-      console.log(error);
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === "P2002") {
           throw new ConflictException(`Use Case with name ${createUsecaseDto.name} already exists`);

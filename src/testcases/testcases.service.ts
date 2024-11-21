@@ -20,7 +20,6 @@ export class TestcasesService {
 
   async generateTestCase(id: string) {
     try {
-      console.log(id);
       const useCase = await this.usecasesService.findOne(id);
       if (!useCase) {
         throw new NotFoundException(`UseCase with id ${id} not found`);
@@ -39,7 +38,6 @@ export class TestcasesService {
       const generatedTestCaseText = await this.iaService.getCompletion(useCase);
       const generatedTestCase2 = cleanResponse(generatedTestCaseText);
       
-      console.log(generatedTestCase2)
 
       const generatedTestCase = JSON.parse(generatedTestCase2);
 
@@ -58,7 +56,6 @@ export class TestcasesService {
         generatedTestCases: generatedTestCase.testCases, // Solo devolvemos los casos generados
       };
     } catch (error) {
-      console.error(error);
 
       // Manejar errores de Prisma
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
@@ -114,7 +111,6 @@ export class TestcasesService {
           : null,
       };
     } catch (error) {
-      console.log(error);
 
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === 'P2002') {

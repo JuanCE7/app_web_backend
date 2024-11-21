@@ -48,7 +48,6 @@ export class ProjectsService {
 
       return project;
     } catch (error) {
-      console.error(error);
       throw new Error('Error creating project');
     }
   }
@@ -69,7 +68,6 @@ export class ProjectsService {
         role: member.role,
       }));
     } catch (error) {
-      console.error("Error fetching user projects:", error);
       throw new Error("Could not fetch user projects");
     }
   }
@@ -184,10 +182,6 @@ export class ProjectsService {
       if (error instanceof NotFoundException || error instanceof ConflictException) {
         throw error;
       }
-
-      // Log del error para debugging
-      console.error('Share project error:', error);
-      
       // Para cualquier otro tipo de error
       throw new InternalServerErrorException('An error occurred while sharing the project');
     }
@@ -230,7 +224,6 @@ export class ProjectsService {
           throw new NotFoundException(`Membership not found`);
         }
       }
-      console.error('Error removing project member:', error);
       throw new InternalServerErrorException('An error occurred while removing the project member');
     }
   }

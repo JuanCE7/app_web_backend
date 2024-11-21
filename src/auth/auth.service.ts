@@ -37,7 +37,6 @@ export class AuthService {
   }
 
   async register({ firstName, lastName, email, password }: RegisterUserDto) {
-    console.log(firstName,lastName,email,password)
     const user = await this.usersService.findByEmail(email);
     if (user) {
       throw new BadRequestException('User already exists');
@@ -65,7 +64,6 @@ export class AuthService {
 
   private async sendEmail(to: string, subject: string, html: string) {
     try {
-      console.log(process.env.SMTP_USER);
       await transporter.sendMail({
         from: process.env.SMTP_USER,
         to,
@@ -73,7 +71,7 @@ export class AuthService {
         html,
       });
     } catch (error) {
-      console.error('Error sending email:', error);
+      throw new Error("Could not fetch mails");
     }
   }
 
