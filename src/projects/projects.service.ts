@@ -239,16 +239,6 @@ export class ProjectsService {
     return projectFound;
   }
 
-  async findOnePerson(id: string) {
-    const projectFound = await this.prismaService.project.findUnique({
-      where: { id },
-    });
-    if (!projectFound) {
-      throw new NotFoundException(`Project with id ${id} not found`);
-    }
-    return projectFound;
-  }
-
   // Actualizar un proyecto existente
   async update(id: string, updateProjectDto: UpdateProjectDto) {
     try {

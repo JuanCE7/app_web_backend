@@ -5,19 +5,35 @@ CREATE TYPE "Roles" AS ENUM ('Tester', 'Administrator');
 CREATE TYPE "ProjectRoles" AS ENUM ('Owner', 'Editor', 'Viewer');
 
 -- CreateTable
-CREATE TABLE "User" (
+CREATE TABLE "Entity" (
     "id" TEXT NOT NULL,
-    "status" BOOLEAN NOT NULL DEFAULT true,
     "firstName" TEXT NOT NULL,
     "lastName" TEXT NOT NULL,
+    "imageEntity" TEXT,
+
+    CONSTRAINT "Entity_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "User" (
+    "id" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
-    "role" "Roles" NOT NULL DEFAULT 'Tester',
-    "image" TEXT,
+    "status" BOOLEAN NOT NULL DEFAULT true,
+    "entityId" TEXT NOT NULL,
+    "roleId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Role" (
+    "id" TEXT NOT NULL,
+    "name" "Roles" NOT NULL,
+
+    CONSTRAINT "Role_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -94,6 +110,12 @@ CREATE TABLE "Explanation" (
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "User_entityId_key" ON "User"("entityId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Role_name_key" ON "Role"("name");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "Project_code_key" ON "Project"("code");
 
 -- CreateIndex
@@ -101,6 +123,12 @@ CREATE UNIQUE INDEX "ProjectMember_userId_projectId_key" ON "ProjectMember"("use
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Explanation_testCaseId_key" ON "Explanation"("testCaseId");
+
+-- AddForeignKey
+ALTER TABLE "User" ADD CONSTRAINT "User_entityId_fkey" FOREIGN KEY ("entityId") REFERENCES "Entity"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "User" ADD CONSTRAINT "User_roleId_fkey" FOREIGN KEY ("roleId") REFERENCES "Role"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "ProjectMember" ADD CONSTRAINT "ProjectMember_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
