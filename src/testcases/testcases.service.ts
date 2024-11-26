@@ -31,31 +31,32 @@ export class TestcasesService {
         if (jsonMatch) {
           return jsonMatch[0]; // Devuelve el contenido JSON extraído
         } else {
-          throw new Error('No se encontró un bloque JSON válido en la respuesta');
+          throw new Error(
+            'No se encontró un bloque JSON válido en la respuesta',
+          );
         }
       };
 
       const generatedTestCaseText = await this.iaService.getCompletion(useCase);
       const generatedTestCase2 = cleanResponse(generatedTestCaseText);
-      
+      console.log(generatedTestCase2);
 
       const generatedTestCase = JSON.parse(generatedTestCase2);
 
-      if (
-        !generatedTestCase ||
-        !generatedTestCase.testCases ||
-        generatedTestCase.testCases.length === 0
-      ) {
-        throw new Error(
-          'No se encontraron casos de prueba generados en la respuesta.',
-        );
+      if (!generatedTestCase.response) {
+        return {
+          success: false,
+          generatedTestCases: generatedTestCase,
+        };
       }
 
-      // Retornar los casos de prueba generados sin guardarlos
       return {
-        generatedTestCases: generatedTestCase.testCases, // Solo devolvemos los casos generados
+        success: true,
+        generatedTestCases: generatedTestCase,
       };
     } catch (error) {
+      // Mejorar el logging del error
+      console.error('Error completo:', error);
 
       // Manejar errores de Prisma
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
@@ -66,8 +67,16 @@ export class TestcasesService {
         }
       }
 
-      // Re-lanzar el error si es otro
-      throw new Error('Error while generating TestCase: ' + error.message);
+      // Si es un error de parsing JSON, dar más contexto
+      if (error instanceof SyntaxError) {
+        throw new Error(`Error al parsear la respuesta JSON: ${error.message}. 
+          Por favor, verifica el formato de la respuesta de la IA.`);
+      }
+
+      // Re-lanzar el error con más contexto
+      throw new Error(
+        `Error durante la generación del caso de prueba: ${error.message}`,
+      );
     }
   }
 
@@ -111,7 +120,6 @@ export class TestcasesService {
           : null,
       };
     } catch (error) {
-
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === 'P2002') {
           // Conflicto de clave única (ej., si el nombre del TestCase ya existe)
