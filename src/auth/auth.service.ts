@@ -49,7 +49,6 @@ export class AuthService {
       password,
       status: true,
       role: Roles.Tester,
-      image: '',
     });
 
     return {

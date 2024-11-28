@@ -109,7 +109,7 @@ export class UsersService {
   }
 
   async updateProfileUser(id: string, updateUserDto: UpdateUserDto) {
-    const { firstName, lastName, email, image, password } = updateUserDto;
+    const { firstName, lastName, email, password } = updateUserDto;
 
     const userDataToUpdate: any = {};
     const entityDataToUpdate: any = {};
@@ -121,7 +121,6 @@ export class UsersService {
     if (email) userDataToUpdate.email = email;
     if (firstName) entityDataToUpdate.firstName = firstName;
     if (lastName) entityDataToUpdate.lastName = lastName;
-    if (image) entityDataToUpdate.imageEntity = image;
 
     try {
       const updatedUser = await this.prisma.user.update({
