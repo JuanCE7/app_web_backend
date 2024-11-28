@@ -8,9 +8,6 @@ export class CreateProjectDto {
   @IsString()
   description?: string; 
 
-  @IsOptional()
-  image?: string; 
-
   @IsString()
   userId: string;
 }

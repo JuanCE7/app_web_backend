@@ -33,7 +33,6 @@ export class ProjectsService {
           code,
           name: createProjectDto.name,
           description: createProjectDto.description,
-          image: createProjectDto.image || '',
           members: {
             create: {
               userId: createProjectDto.userId,
@@ -247,7 +246,6 @@ export class ProjectsService {
         data: {
           name: updateProjectDto.name,
           description: updateProjectDto.description,
-          image: updateProjectDto.image,
         },
       });
 

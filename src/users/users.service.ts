@@ -93,7 +93,6 @@ export class UsersService {
           select: {
             firstName: true,
             lastName: true,
-            imageEntity: true,
           },
         },
         role: {

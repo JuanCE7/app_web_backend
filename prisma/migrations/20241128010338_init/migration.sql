@@ -9,7 +9,6 @@ CREATE TABLE "Entity" (
     "id" TEXT NOT NULL,
     "firstName" TEXT NOT NULL,
     "lastName" TEXT NOT NULL,
-    "imageEntity" TEXT,
 
     CONSTRAINT "Entity_pkey" PRIMARY KEY ("id")
 );
@@ -42,7 +41,6 @@ CREATE TABLE "Project" (
     "code" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "description" TEXT,
-    "image" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 

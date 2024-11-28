@@ -12,7 +12,6 @@ model Entity {
   id            String  @id @default(uuid())
   firstName     String
   lastName      String
-  imageEntity   String?
   user          User?
 }
 
@@ -52,7 +51,6 @@ model Project {
   code        String      @unique
   name        String
   description String?
-  image       String?
   useCases    UseCase[]   @relation("ProjectUseCases")
   members     ProjectMember[]
   createdAt   DateTime    @default(now())
