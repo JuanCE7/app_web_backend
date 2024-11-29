@@ -70,7 +70,7 @@ export class AuthService {
         html,
       });
     } catch (error) {
-      throw new Error("Could not fetch mails");
+      throw new Error('Could not fetch mails');
     }
   }
 
@@ -101,6 +101,7 @@ export class AuthService {
 
   async passwordRecovery(email: string) {
     const user = await this.usersService.findByEmail(email);
+
     if (!user) {
       throw new UnauthorizedException(
         'Este email no se encuentra en la base de datos',
@@ -127,20 +128,37 @@ export class AuthService {
     return { otpToken };
   }
 
-  async verifyOtp(verifyOtpDto: VerifyOtpDto): Promise<boolean> {
-    try {
-      const decoded = await this.jwtService.verifyAsync(verifyOtpDto.token);
-
-      // Verificar si el OTP ingresado coincide con el OTP almacenado en el token
-      if (decoded.otp === verifyOtpDto.enteredOtp) {
-        return true;
-      } else {
-        throw new UnauthorizedException('El código OTP es incorrecto');
+  async verifyOtp({ token, enteredOtp }: VerifyOtpDto) {
+    try { 
+      const decoded = this.jwtService.decode(token) as { email: string; otp: string; exp: number };
+  
+      if (!decoded) {
+        throw new UnauthorizedException('Token inválido');
       }
+  
+      const currentTimestamp = Math.floor(Date.now() / 1000);
+      if (decoded.exp && decoded.exp < currentTimestamp) {
+        throw new UnauthorizedException('El código OTP ha expirado');
+      }
+  
+      if (decoded.otp !== enteredOtp) {
+        throw new UnauthorizedException('Código OTP inválido');
+      }
+  
+      return { 
+        success: true, 
+        message: 'OTP validado correctamente',
+        email: decoded.email 
+      };
+  
     } catch (error) {
-      throw new UnauthorizedException(
-        'El código OTP ha expirado o es inválido',
-      );
+      console.error('Error al verificar el OTP:', error);
+      
+      if (error instanceof UnauthorizedException) {
+        throw error;
+      }
+  
+      throw new UnauthorizedException('Error al procesar el código OTP');
     }
   }
 
