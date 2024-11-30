@@ -136,15 +136,22 @@ export class TestcasesService {
     }
   }
 
-  findAll(useCaseId: string) {
-    return this.prismaService.testCase.findMany({
-      where: {
-        useCaseId: useCaseId,
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-    });
+  async findAll(useCaseId: string) {
+    try {
+      const testCases = await this.prismaService.testCase.findMany({
+        where: {
+          useCaseId: useCaseId,
+        },
+        orderBy: {
+          createdAt: 'desc',
+        },
+      });
+console.log(testCases)
+      return testCases;
+    } catch (error) {
+      throw new Error("Could not fetch user projects");
+    }
+    
   }
 
   async findOne(id: string) {
