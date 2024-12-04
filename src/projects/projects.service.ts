@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { Prisma, ProjectRoles } from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
 import { ShareProjectDto } from './dto/share-project.dto';

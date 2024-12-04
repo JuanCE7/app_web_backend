@@ -111,6 +111,7 @@ export class UsersService {
   async updateProfileUser(id: string, updateUserDto: UpdateUserDto) {
     const { firstName, lastName, email, password } = updateUserDto;
 
+    console.log(updateUserDto)
     const userDataToUpdate: any = {};
     const entityDataToUpdate: any = {};
 

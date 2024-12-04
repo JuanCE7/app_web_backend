@@ -6,10 +6,10 @@ import {
 } from '@nestjs/common';
 import { CreateTestCaseDto } from './dto/create-testcase.dto';
 import { UpdateTestCaseDto } from './dto/update-testcase.dto';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { Prisma } from '@prisma/client';
-import { UsecasesService } from 'src/usecases/usecases.service';
-import { IaService } from 'src/ia/ia.service';
+import { UsecasesService } from '../usecases/usecases.service';
+import { IaService } from '../ia/ia.service';
 @Injectable()
 export class TestcasesService {
   constructor(
@@ -29,7 +29,7 @@ export class TestcasesService {
         // Utiliza una expresión regular para extraer el contenido entre `{` y `}`
         const jsonMatch = response.match(/{[\s\S]*}/);
         if (jsonMatch) {
-          return jsonMatch[0]; // Devuelve el contenido JSON extraído
+          return jsonMatch[0];
         } else {
           throw new Error(
             'No se encontró un bloque JSON válido en la respuesta',

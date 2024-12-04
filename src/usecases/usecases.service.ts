@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { CreateUseCaseDto } from './dto/create-usecase.dto';
 import { UpdateUseCaseDto } from './dto/update-usecase.dto';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { Prisma } from '@prisma/client';
 @Injectable()
 export class UsecasesService {

@@ -162,20 +162,25 @@ export class AuthService {
     }
   }
 
-  async login({ email, password }: LoginDto) {
+  private async validateUser(email: string, password: string) {
     const user = await this.usersService.findByEmail(email);
     if (!user) {
-      throw new UnauthorizedException('Correo incorrecto');
+      throw new UnauthorizedException('No se encontró una cuenta con ese correo electrónico');
     }
-
+  
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
       throw new UnauthorizedException('Contraseña incorrecta');
     }
-
+  
+    return user;
+  }
+  
+  async login({ email, password }: LoginDto) {
+    const user = await this.validateUser(email, password);
     const payload = { email: user.email, role: user.role };
     const token = await this.jwtService.signAsync(payload);
-
+  
     return {
       token,
       email,
