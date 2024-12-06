@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  InternalServerErrorException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
@@ -33,13 +34,13 @@ export class AuthService {
 
   async logout(token: string) {
     this.revokeToken(token);
-    return { message: 'Successfully logged out' };
+    return { message: 'Sesión Cerrada correctamente'};
   }
 
   async register({ firstName, lastName, email, password }: RegisterUserDto) {
     const user = await this.usersService.findByEmail(email);
     if (user) {
-      throw new BadRequestException('User already exists');
+      throw new BadRequestException('El Correo ya existe');
     }
 
     await this.usersService.createUser({
@@ -70,7 +71,7 @@ export class AuthService {
         html,
       });
     } catch (error) {
-      throw new Error('Could not fetch mails');
+      throw new Error('No se ha podido enviar el correo');
     }
   }
 
@@ -177,16 +178,23 @@ export class AuthService {
   }
   
   async login({ email, password }: LoginDto) {
-    const user = await this.validateUser(email, password);
-    const payload = { email: user.email, role: user.role };
-    const token = await this.jwtService.signAsync(payload);
+    try {
+      const user = await this.validateUser(email, password);
+      const payload = { email: user.email, role: user.role };
+      const token = await this.jwtService.signAsync(payload);
   
-    return {
-      token,
-      email,
-      role: user.role.name,
-    };
-  }
+      return {
+        token,
+        email: user.email,
+        role: user.role.name,
+      };
+    } catch (error) {
+      if (error instanceof UnauthorizedException) {
+        throw new UnauthorizedException('Correo o contraseña incorrectos.');
+      }
+      throw new InternalServerErrorException('Error al procesar la solicitud.');
+    }
+  }  
 
   async profile({ email, role }: { email: string; role: string }) {
     return await this.usersService.findByEmail(email);

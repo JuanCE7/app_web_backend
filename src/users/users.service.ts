@@ -109,9 +109,8 @@ export class UsersService {
   }
 
   async updateProfileUser(id: string, updateUserDto: UpdateUserDto) {
-    const { firstName, lastName, email, password } = updateUserDto;
+    const { firstName, lastName, email, password, role } = updateUserDto;
 
-    console.log(updateUserDto)
     const userDataToUpdate: any = {};
     const entityDataToUpdate: any = {};
 
@@ -131,6 +130,11 @@ export class UsersService {
           entity: {
             update: entityDataToUpdate,
           },
+          role: role
+            ? {
+                connect: { name: role },
+              }
+            : undefined,
         },
         include: {
           entity: true,
