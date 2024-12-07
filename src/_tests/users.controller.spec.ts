@@ -8,7 +8,7 @@ import { UpdateUserDto } from '../users/dto/update-user.dto';
 
 describe('UsersController', () => {
   let app: INestApplication;
-  let usersService = {
+  const usersService = {
     createUser: jest.fn(),
     getUsers: jest.fn(),
     getUserById: jest.fn(),
@@ -33,8 +33,14 @@ describe('UsersController', () => {
   });
 
   it('/POST users (create)', async () => {
-    const createUserDto: CreateUserDto = { firstName: 'Test User', lastName: 'test lastName',
-    email: 'test@example.com', password: 'test12345', role: 'Tester', status: false };
+    const createUserDto: CreateUserDto = {
+      firstName: 'Test User',
+      lastName: 'test lastName',
+      email: 'test@example.com',
+      password: 'test12345',
+      role: 'Tester',
+      status: false,
+    };
     usersService.createUser.mockReturnValue({ id: '1', ...createUserDto });
 
     return request(app.getHttpServer())
@@ -45,7 +51,9 @@ describe('UsersController', () => {
   });
 
   it('/GET users (findAll)', async () => {
-    usersService.getUsers.mockReturnValue([{ id: '1', name: 'Test User', email: 'test@example.com' }]);
+    usersService.getUsers.mockReturnValue([
+      { id: '1', name: 'Test User', email: 'test@example.com' },
+    ]);
 
     return request(app.getHttpServer())
       .get('/users')
@@ -55,7 +63,11 @@ describe('UsersController', () => {
 
   it('/GET users/:id (findOne)', async () => {
     const userId = '1';
-    usersService.getUserById.mockReturnValue({ id: userId, name: 'Test User', email: 'test@example.com' });
+    usersService.getUserById.mockReturnValue({
+      id: userId,
+      name: 'Test User',
+      email: 'test@example.com',
+    });
 
     return request(app.getHttpServer())
       .get(`/users/${userId}`)
@@ -65,7 +77,11 @@ describe('UsersController', () => {
 
   it('/GET users/mail/:email (findByEmail)', async () => {
     const email = 'test@example.com';
-    usersService.findByEmail.mockReturnValue({ id: '1', name: 'Test User', email });
+    usersService.findByEmail.mockReturnValue({
+      id: '1',
+      name: 'Test User',
+      email,
+    });
 
     return request(app.getHttpServer())
       .get(`/users/mail/${email}`)
@@ -73,21 +89,9 @@ describe('UsersController', () => {
       .expect(usersService.findByEmail.mock.results[0].value);
   });
 
-//   it('/PATCH users/:id (update)', async () => {
-//     const userId = '1';
-//     const updateUserDto: UpdateUserDto = { name: 'Updated User' };
-//     usersService.updateProfileUser.mockReturnValue({ id: userId, ...updateUserDto });
-
-//     return request(app.getHttpServer())
-//       .patch(`/users/${userId}`)
-//       .send(updateUserDto)
-//       .expect(200)
-//       .expect(usersService.updateProfileUser.mock.results[0].value);
-//   });
-
   it('Change Role', async () => {
     const userId = '1';
-    const updateUserDto: UpdateUserDto = { role: 'Administrator'};
+    const updateUserDto: UpdateUserDto = { role: 'Administrator' };
     usersService.updateUser.mockReturnValue({ id: userId, ...updateUserDto });
 
     return request(app.getHttpServer())

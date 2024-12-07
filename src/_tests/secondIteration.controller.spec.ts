@@ -41,7 +41,11 @@ describe('ProjectsController', () => {
 
   describe('create', () => {
     it('should create a project', async () => {
-      const createProjectDto: CreateProjectDto = { name: 'New Project', description: 'Project description', userId : '1'};
+      const createProjectDto: CreateProjectDto = {
+        name: 'New Project',
+        description: 'Project description',
+        userId: '1',
+      };
       const result = await projectsController.create(createProjectDto);
       expect(result).toEqual({ ...createProjectDto, id: '1' });
       expect(projectsService.create).toHaveBeenCalledWith(createProjectDto);
@@ -53,7 +57,9 @@ describe('ProjectsController', () => {
       const shareProjectDto: ShareProjectDto = { code: '1', userId: '2' };
       const result = await projectsController.shareProject(shareProjectDto);
       expect(result).toEqual({ ...shareProjectDto, shared: true });
-      expect(projectsService.shareProject).toHaveBeenCalledWith(shareProjectDto);
+      expect(projectsService.shareProject).toHaveBeenCalledWith(
+        shareProjectDto,
+      );
     });
   });
 

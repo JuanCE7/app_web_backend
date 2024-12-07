@@ -34,7 +34,7 @@ export class AuthService {
 
   async logout(token: string) {
     this.revokeToken(token);
-    return { message: 'Sesión Cerrada correctamente'};
+    return { message: 'Sesión Cerrada correctamente' };
   }
 
   async register({ firstName, lastName, email, password }: RegisterUserDto) {
@@ -71,7 +71,7 @@ export class AuthService {
         html,
       });
     } catch (error) {
-      throw new Error('No se ha podido enviar el correo');
+      throw new Error('No se ha podido enviar el correo' + error);
     }
   }
 
@@ -123,42 +123,39 @@ export class AuthService {
     await this.sendEmail(
       email,
       'Recuperación de contraseña en CaseCraft',
-      htmlContent
+      htmlContent,
     );
 
     return { otpToken };
   }
 
   async verifyOtp({ token, enteredOtp }: VerifyOtpDto) {
-    try { 
-      const decoded = this.jwtService.decode(token) as { email: string; otp: string; exp: number };
-  
+    try {
+      const decoded = this.jwtService.decode(token) as {
+        email: string;
+        otp: string;
+        exp: number;
+      };
       if (!decoded) {
         throw new UnauthorizedException('Token inválido');
       }
-  
       const currentTimestamp = Math.floor(Date.now() / 1000);
       if (decoded.exp && decoded.exp < currentTimestamp) {
         throw new UnauthorizedException('El código OTP ha expirado');
       }
-  
       if (decoded.otp !== enteredOtp) {
         throw new UnauthorizedException('Código OTP inválido');
       }
-  
-      return { 
-        success: true, 
+      return {
+        success: true,
         message: 'OTP validado correctamente',
-        email: decoded.email 
+        email: decoded.email,
       };
-  
     } catch (error) {
       console.error('Error al verificar el OTP:', error);
-      
       if (error instanceof UnauthorizedException) {
         throw error;
       }
-  
       throw new UnauthorizedException('Error al procesar el código OTP');
     }
   }
@@ -166,23 +163,25 @@ export class AuthService {
   private async validateUser(email: string, password: string) {
     const user = await this.usersService.findByEmail(email);
     if (!user) {
-      throw new UnauthorizedException('No se encontró una cuenta con ese correo electrónico');
+      throw new UnauthorizedException(
+        'No se encontró una cuenta con ese correo electrónico',
+      );
     }
-  
+
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
       throw new UnauthorizedException('Contraseña incorrecta');
     }
-  
+
     return user;
   }
-  
+
   async login({ email, password }: LoginDto) {
     try {
       const user = await this.validateUser(email, password);
       const payload = { email: user.email, role: user.role };
       const token = await this.jwtService.signAsync(payload);
-  
+
       return {
         token,
         email: user.email,
@@ -194,9 +193,9 @@ export class AuthService {
       }
       throw new InternalServerErrorException('Error al procesar la solicitud.');
     }
-  }  
+  }
 
-  async profile({ email, role }: { email: string; role: string }) {
+  async profile({ email }: { email: string; role: string }) {
     return await this.usersService.findByEmail(email);
   }
 }

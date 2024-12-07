@@ -4,7 +4,7 @@ import { AuthService } from '../auth/auth.service';
 import { RegisterUserDto } from '../auth/dto/register.dto';
 import { LoginDto } from '../auth/dto/user-login.dto';
 import { VerifyOtpDto } from '../auth/dto/verifyOtp.dto';
-import { JwtModule } from '@nestjs/jwt'; 
+import { JwtModule } from '@nestjs/jwt';
 import { UnauthorizedException } from '@nestjs/common';
 
 describe('AuthController', () => {
@@ -13,11 +13,11 @@ describe('AuthController', () => {
 
   const mockAuthService = {
     register: jest.fn((dto) => ({ ...dto, id: 1 })),
-    verifyOtp: jest.fn((dto) => ({ success: true })),
+    verifyOtp: jest.fn(() => ({ success: true })),
     passwordRecovery: jest.fn((email) => ({ email, status: 'email sent' })),
-    login: jest.fn((dto) => ({ accessToken: 'fake-jwt-token' })),
+    login: jest.fn(() => ({ accessToken: 'fake-jwt-token' })),
     profile: jest.fn((user) => ({ ...user, profile: 'user-profile' })),
-    logout: jest.fn((token) => ({ success: true })),
+    logout: jest.fn(() => ({ success: true })),
   };
 
   beforeEach(async () => {
@@ -31,8 +31,8 @@ describe('AuthController', () => {
       ],
       imports: [
         JwtModule.register({
-          secret: 'secretKey', 
-          signOptions: { expiresIn: '60s' }, 
+          secret: 'secretKey',
+          signOptions: { expiresIn: '60s' },
         }),
       ],
     }).compile();
@@ -47,7 +47,12 @@ describe('AuthController', () => {
 
   describe('register', () => {
     it('should register a user', async () => {
-      const registerDto: RegisterUserDto = { firstName: 'test', lastName:'test', email: 'test@example.com', password: '12345' };
+      const registerDto: RegisterUserDto = {
+        firstName: 'test',
+        lastName: 'test',
+        email: 'test@example.com',
+        password: '12345',
+      };
       const result = await authController.register(registerDto);
       expect(result).toEqual({ ...registerDto, id: 1 });
       expect(authService.register).toHaveBeenCalledWith(registerDto);
@@ -56,7 +61,10 @@ describe('AuthController', () => {
 
   describe('verifyOtp', () => {
     it('should verify OTP', async () => {
-      const verifyOtpDto: VerifyOtpDto = { token: 'tasfasfe124198yuw9d1n2d1', enteredOtp: '123456' };
+      const verifyOtpDto: VerifyOtpDto = {
+        token: 'tasfasfe124198yuw9d1n2d1',
+        enteredOtp: '123456',
+      };
       const result = await authController.verifyOtp(verifyOtpDto);
       expect(result).toEqual({ success: true });
       expect(authService.verifyOtp).toHaveBeenCalledWith(verifyOtpDto);
@@ -81,13 +89,26 @@ describe('AuthController', () => {
     });
 
     it('should throw an error for incorrect credentials', async () => {
-      const loginDto: LoginDto = { email: 'incorrect@example.com', password: 'wrongpassword' };
-      jest.spyOn(authService, 'login').mockRejectedValueOnce(new UnauthorizedException('No se encontró una cuenta con ese correo electrónico'));
+      const loginDto: LoginDto = {
+        email: 'incorrect@example.com',
+        password: 'wrongpassword',
+      };
+      jest
+        .spyOn(authService, 'login')
+        .mockRejectedValueOnce(
+          new UnauthorizedException(
+            'No se encontró una cuenta con ese correo electrónico',
+          ),
+        );
       try {
         await authController.login(loginDto);
       } catch (error) {
-        expect(error.response).toEqual({ message: 'No se encontró una cuenta con ese correo electrónico', error: 'Unauthorized', statusCode: 401 });
-        expect(error.status).toEqual(401); 
+        expect(error.response).toEqual({
+          message: 'No se encontró una cuenta con ese correo electrónico',
+          error: 'Unauthorized',
+          statusCode: 401,
+        });
+        expect(error.status).toEqual(401);
       }
     });
   });
