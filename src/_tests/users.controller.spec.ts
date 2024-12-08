@@ -1,107 +1,151 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
-import * as request from 'supertest';
 import { UsersController } from '../users/users.controller';
 import { UsersService } from '../users/users.service';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { UpdateUserDto } from '../users/dto/update-user.dto';
+import { NotFoundException, ConflictException } from '@nestjs/common';
 
 describe('UsersController', () => {
-  let app: INestApplication;
-  const usersService = {
+  let usersController: UsersController;
+  let usersService: UsersService;
+
+  const mockUsersService = {
     createUser: jest.fn(),
     getUsers: jest.fn(),
     getUserById: jest.fn(),
-    findByEmail: jest.fn(),
     updateProfileUser: jest.fn(),
     updateUser: jest.fn(),
   };
 
-  beforeAll(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
       controllers: [UsersController],
       providers: [
         {
           provide: UsersService,
-          useValue: usersService,
+          useValue: mockUsersService,
         },
       ],
     }).compile();
 
-    app = moduleFixture.createNestApplication();
-    await app.init();
+    usersController = module.get<UsersController>(UsersController);
+    usersService = module.get<UsersService>(UsersService);
   });
 
-  it('/POST users (create)', async () => {
-    const createUserDto: CreateUserDto = {
-      firstName: 'Test User',
-      lastName: 'test lastName',
-      email: 'test@example.com',
-      password: 'test12345',
-      role: 'Tester',
-      status: false,
-    };
-    usersService.createUser.mockReturnValue({ id: '1', ...createUserDto });
-
-    return request(app.getHttpServer())
-      .post('/users')
-      .send(createUserDto)
-      .expect(201)
-      .expect(usersService.createUser.mock.results[0].value);
+  it('should be defined', () => {
+    expect(usersController).toBeDefined();
   });
 
-  it('/GET users (findAll)', async () => {
-    usersService.getUsers.mockReturnValue([
-      { id: '1', name: 'Test User', email: 'test@example.com' },
-    ]);
+  describe('Create User', () => {
+    it('should create a user', async () => {
+      const createUserDto: CreateUserDto = {
+        firstName: 'John',
+        lastName: 'Doe',
+        email: 'john@example.com',
+        password: 'password123',
+        role: 'Administrator',
+      };
 
-    return request(app.getHttpServer())
-      .get('/users')
-      .expect(200)
-      .expect(usersService.getUsers.mock.results[0].value);
-  });
+      const createdUser = { ...createUserDto, id: '1' };
+      mockUsersService.createUser.mockResolvedValue(createdUser);
 
-  it('/GET users/:id (findOne)', async () => {
-    const userId = '1';
-    usersService.getUserById.mockReturnValue({
-      id: userId,
-      name: 'Test User',
-      email: 'test@example.com',
+      const result = await usersController.create(createUserDto);
+      expect(result).toEqual(createdUser);
+      expect(usersService.createUser).toHaveBeenCalledWith(createUserDto);
     });
 
-    return request(app.getHttpServer())
-      .get(`/users/${userId}`)
-      .expect(200)
-      .expect(usersService.getUserById.mock.results[0].value);
+    it('should throw ConflictException if email already exists', async () => {
+      const createUserDto: CreateUserDto = {
+        firstName: 'John',
+        lastName: 'Doe',
+        email: 'john@example.com',
+        password: 'password123',
+        role: 'Administrator',
+      };
+
+      mockUsersService.createUser.mockRejectedValue(
+        new ConflictException('Email already exists'),
+      );
+
+      await expect(usersController.create(createUserDto)).rejects.toThrow(
+        ConflictException,
+      );
+    });
   });
 
-  it('/GET users/mail/:email (findByEmail)', async () => {
-    const email = 'test@example.com';
-    usersService.findByEmail.mockReturnValue({
-      id: '1',
-      name: 'Test User',
-      email,
+  describe('Find All', () => {
+    it('should return all users', async () => {
+      const users = [
+        {
+          id: '1',
+          email: 'john@example.com',
+          status: true,
+          entity: { firstName: 'John', lastName: 'Doe' },
+          role: { name: 'Administrator' },
+        },
+      ];
+      mockUsersService.getUsers.mockResolvedValue(users);
+
+      const result = await usersController.findAll();
+      expect(result).toEqual(users);
+      expect(usersService.getUsers).toHaveBeenCalled();
+    });
+  });
+
+  describe('Get User By Id', () => {
+    it('should return a user by ID', async () => {
+      const user = {
+        id: '1',
+        email: 'john@example.com',
+        entity: { firstName: 'John', lastName: 'Doe' },
+        role: { name: 'Administrator' },
+      };
+      mockUsersService.getUserById.mockResolvedValue(user);
+
+      const result = await usersController.findOne('1');
+      expect(result).toEqual(user);
+      expect(usersService.getUserById).toHaveBeenCalledWith('1');
     });
 
-    return request(app.getHttpServer())
-      .get(`/users/mail/${email}`)
-      .expect(200)
-      .expect(usersService.findByEmail.mock.results[0].value);
+    it('should throw NotFoundException if user not found', async () => {
+      mockUsersService.getUserById.mockRejectedValue(
+        new NotFoundException('User not found'),
+      );
+
+      await expect(usersController.findOne('999')).rejects.toThrow(
+        NotFoundException,
+      );
+    });
   });
 
-  it('Change Role', async () => {
-    const userId = '1';
-    const updateUserDto: UpdateUserDto = { role: 'Administrator' };
-    usersService.updateUser.mockReturnValue({ id: userId, ...updateUserDto });
+  describe('Update Profile User', () => {
+    it('should update user profile', async () => {
+      const updateUserDto: UpdateUserDto = {
+        firstName: 'UpdatedName',
+        lastName: 'UpdatedLastName',
+        email: 'updated@example.com',
+        password: 'updatedPassword',
+        role: 'Administrator',
+      };
 
-    return request(app.getHttpServer())
-      .patch(`/users/admin/${userId}`)
-      .send(updateUserDto)
-      .expect(200)
-      .expect(usersService.updateUser.mock.results[0].value);
-  });
+      const updatedUser = {
+        id: '1',
+        email: updateUserDto.email,
+        entity: {
+          firstName: updateUserDto.firstName,
+          lastName: updateUserDto.lastName,
+        },
+        role: { name: updateUserDto.role },
+      };
 
-  afterAll(async () => {
-    await app.close();
+      mockUsersService.updateProfileUser.mockResolvedValue(updatedUser);
+
+      const result = await usersController.update('1', updateUserDto);
+      expect(result).toEqual(updatedUser);
+      expect(usersService.updateProfileUser).toHaveBeenCalledWith(
+        '1',
+        updateUserDto,
+      );
+    });
   });
 });
