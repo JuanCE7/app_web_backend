@@ -13,7 +13,6 @@ export class IaService {
     const useCaseJson = JSON.stringify(useCaseData, null, 2);
     const promptData = `${prompt} \n${useCaseJson}`;
 
-    console.log(useCaseJson)
     try {
       const response = await cohere.v2.chat({
         model: 'command-r',

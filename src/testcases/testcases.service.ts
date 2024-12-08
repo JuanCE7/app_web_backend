@@ -39,7 +39,6 @@ export class TestcasesService {
 
       const generatedTestCaseText = await this.iaService.getCompletion(useCase);
       const generatedTestCase2 = cleanResponse(generatedTestCaseText);
-      console.log(generatedTestCase2);
 
       const generatedTestCase = JSON.parse(generatedTestCase2);
 
@@ -55,9 +54,6 @@ export class TestcasesService {
         generatedTestCases: generatedTestCase,
       };
     } catch (error) {
-      // Mejorar el logging del error
-      console.error('Error completo:', error);
-
       // Manejar errores de Prisma
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === 'P2002') {
@@ -146,7 +142,6 @@ export class TestcasesService {
           createdAt: 'desc',
         },
       });
-console.log(testCases)
       return testCases;
     } catch (error) {
       throw new Error("Could not fetch user projects");

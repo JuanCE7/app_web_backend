@@ -152,7 +152,6 @@ export class AuthService {
         email: decoded.email,
       };
     } catch (error) {
-      console.error('Error al verificar el OTP:', error);
       if (error instanceof UnauthorizedException) {
         throw error;
       }
