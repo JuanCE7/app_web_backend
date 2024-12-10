@@ -24,7 +24,7 @@ export class UsersService {
       });
 
       if (!roleRecord) {
-        throw new NotFoundException(`Role ${role} not found`);
+        throw new NotFoundException(`Rol ${role} no encontrado`);
       }
 
       // Crear el usuario junto con la entidad
@@ -55,7 +55,7 @@ export class UsersService {
         error instanceof Prisma.PrismaClientKnownRequestError &&
         error.code === 'P2002'
       ) {
-        throw new ConflictException('Email already exists');
+        throw new ConflictException('El email ya existe');
       }
       throw error;
     }
@@ -102,7 +102,7 @@ export class UsersService {
       },
     });
     if (!user) {
-      throw new NotFoundException(`User with id ${id} not found`);
+      throw new NotFoundException(`Usuario no encontrado`);
     }
     return { user };
   }
@@ -148,7 +148,7 @@ export class UsersService {
         error instanceof Prisma.PrismaClientKnownRequestError &&
         error.code === 'P2025'
       ) {
-        throw new NotFoundException(`User with id ${id} not found`);
+        throw new NotFoundException(`Usuario no encontrado`);
       }
       throw error;
     }

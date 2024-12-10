@@ -47,7 +47,7 @@ export class ProjectsService {
 
       return project;
     } catch (error) {
-      throw new Error('Error creating project');
+      throw new Error('Error creando el proyecto');
     }
   }
 
@@ -67,7 +67,7 @@ export class ProjectsService {
         role: member.role,
       }));
     } catch (error) {
-      throw new Error("Could not fetch user projects");
+      throw new Error("No se han podido recuperar los proyectos del usuario");
     }
   }
   
@@ -86,7 +86,7 @@ export class ProjectsService {
       });
 
       if (!projectFound) {
-        throw new NotFoundException(`Project with code ${shareProjectDto.code} not found`);
+        throw new NotFoundException(`Proyecto con código ${shareProjectDto.code} no encontrado`);
       }
 
       // Verificar si el usuario ya es miembro del proyecto
@@ -102,9 +102,9 @@ export class ProjectsService {
       if (existingMembership) {
         // Si ya es miembro, verificar si es Owner
         if (existingMembership.role === ProjectRoles.Owner) {
-          throw new ConflictException(`You are already the owner of this project`);
+          throw new ConflictException(`Usted ya es el propietario de este proyecto`);
         } else {
-          throw new ConflictException(`You are already a member of this project`);
+          throw new ConflictException(`Usted ya es miembro de este proyecto`);
         }
       }
 
@@ -118,7 +118,7 @@ export class ProjectsService {
       // Establecer un límite máximo de miembros (puedes ajustar este número según tus necesidades)
       const MAX_MEMBERS = 10;
       if (memberCount >= MAX_MEMBERS) {
-        throw new ConflictException(`Project has reached the maximum limit of ${MAX_MEMBERS} members`);
+        throw new ConflictException(`El proyecto ha alcanzado el límite máximo de ${MAX_MEMBERS} miembros`);
       }
 
       // Crear nuevo miembro usando una transacción
@@ -134,7 +134,7 @@ export class ProjectsService {
         });
 
         if (finalCheck) {
-          throw new ConflictException(`You are already a member of this project`);
+          throw new ConflictException(`Ya es miembro de este proyecto`);
         }
 
         // Crear el nuevo miembro
@@ -142,7 +142,7 @@ export class ProjectsService {
           data: {
             userId: shareProjectDto.userId,
             projectId: projectFound.id,
-            role: ProjectRoles.Editor, // Usando el enum del schema
+            role: ProjectRoles.Editor,
           },
           include: {
             user: {
@@ -161,34 +161,29 @@ export class ProjectsService {
 
       return {
         success: true,
-        message: 'Successfully joined the project',
+        message: 'Se ha incorporado con éxito al proyecto',
         member: newMember,
       };
 
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        // P2002 es el código de error para violaciones de unicidad
         if (error.code === 'P2002') {
-          throw new ConflictException(`User is already a member of this project`);
+          throw new ConflictException(`El usuario ya es miembro de este proyecto`);
         }
-        // P2025 es el código de error para registros no encontrados
         if (error.code === 'P2025') {
-          throw new NotFoundException(`Project or user not found`);
+          throw new NotFoundException(`Proyecto o usuario no encontrado`);
         }
       }
       
-      // Si es uno de nuestros errores personalizados, lo propagamos
       if (error instanceof NotFoundException || error instanceof ConflictException) {
         throw error;
       }
-      // Para cualquier otro tipo de error
-      throw new InternalServerErrorException('An error occurred while sharing the project');
+      throw new InternalServerErrorException('Se ha producido un error al compartir el proyecto');
     }
   }
 
   async exitProject(exitProjectDto: ExitProjectDto) {
     try {
-      // Verificar si la relación existe antes de intentar eliminarla
       const membership = await this.prismaService.projectMember.findUnique({
         where: {
           userId_projectId: {
@@ -199,10 +194,9 @@ export class ProjectsService {
       });
   
       if (!membership) {
-        throw new NotFoundException(`User with id ${exitProjectDto.userId} is not a member of project with id ${exitProjectDto.projectId}`);
+        throw new NotFoundException(`El usuario con id ${exitProjectDto.userId} no es miembro del proyecto con id ${exitProjectDto.projectId}.`);
       }
   
-      // Eliminar la relación en la tabla projectMember
       await this.prismaService.projectMember.delete({
         where: {
           userId_projectId: {
@@ -214,31 +208,28 @@ export class ProjectsService {
   
       return {
         success: true,
-        message: `User with id ${exitProjectDto.userId} successfully removed from project with id ${exitProjectDto.projectId}`,
+        message: `Usuario con id ${exitProjectDto.userId} eliminado correctamente del proyecto con id ${exitProjectDto.projectId}`,
       };
     } catch (error) {
-      // Manejo de errores de Prisma
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === 'P2025') {
-          throw new NotFoundException(`Membership not found`);
+          throw new NotFoundException(`Miembro no encontrado`);
         }
       }
-      throw new InternalServerErrorException('An error occurred while removing the project member');
+      throw new InternalServerErrorException('Se ha producido un error al eliminar el miembro del proyecto');
     }
   }
   
-  // Obtener un proyecto por ID
   async findOne(id: string) {
     const projectFound = await this.prismaService.project.findUnique({
       where: { id },
     });
     if (!projectFound) {
-      throw new NotFoundException(`Project with id ${id} not found`);
+      throw new NotFoundException(`Proyecto no encontrado`);
     }
     return projectFound;
   }
 
-  // Actualizar un proyecto existente
   async update(id: string, updateProjectDto: UpdateProjectDto) {
     try {
       const projectUpdate = await this.prismaService.project.update({
@@ -250,14 +241,14 @@ export class ProjectsService {
       });
 
       if (!projectUpdate) {
-        throw new NotFoundException(`Project with id ${id} not found`);
+        throw new NotFoundException(`Proyecto no encontrado`);
       }
 
       return projectUpdate;
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === 'P2025') {
-          throw new NotFoundException(`Project with id ${id} not found`);
+          throw new NotFoundException(`Proyecto no encontrado`);
         }
       }
       throw error;
@@ -272,7 +263,7 @@ export class ProjectsService {
       });
 
       if (!deletedProject) {
-        throw new NotFoundException(`Project with id ${id} not found`);
+        throw new NotFoundException(`Proyecto no encontrado`);
       }
 
       return deletedProject;
@@ -281,7 +272,7 @@ export class ProjectsService {
         error instanceof Prisma.PrismaClientKnownRequestError &&
         error.code === 'P2025'
       ) {
-        throw new NotFoundException(`Project with id ${id} not found`);
+        throw new NotFoundException(`Proyecto no encontrado`);
       }
       throw error;
     }

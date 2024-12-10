@@ -22,7 +22,7 @@ export class TestcasesService {
     try {
       const useCase = await this.usecasesService.findOne(id);
       if (!useCase) {
-        throw new NotFoundException(`UseCase with id ${id} not found`);
+        throw new NotFoundException(`Caso de Uso no encontrado`);
       }
 
       const cleanResponse = (response: string): string => {
@@ -54,22 +54,19 @@ export class TestcasesService {
         generatedTestCases: generatedTestCase,
       };
     } catch (error) {
-      // Manejar errores de Prisma
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === 'P2002') {
           throw new ConflictException(
-            `TestCase for UseCase with id ${id} already exists`,
+            `Caso de prueba funcional del caso de uso ya existe`,
           );
         }
       }
 
-      // Si es un error de parsing JSON, dar más contexto
       if (error instanceof SyntaxError) {
         throw new Error(`Error al parsear la respuesta JSON: ${error.message}. 
           Por favor, verifica el formato de la respuesta de la IA.`);
       }
 
-      // Re-lanzar el error con más contexto
       throw new Error(
         `Error durante la generación del caso de prueba: ${error.message}`,
       );
@@ -78,7 +75,6 @@ export class TestcasesService {
 
   async create(createTestCaseDto: CreateTestCaseDto) {
     try {
-      // Primero, creamos el TestCase
       const testCase = await this.prismaService.testCase.create({
         data: {
           code: createTestCaseDto.code,
@@ -90,8 +86,6 @@ export class TestcasesService {
           useCaseId: createTestCaseDto.useCaseId,
         },
       });
-
-      // Si se proporciona una explicación, creamos también la Explanation
       if (
         createTestCaseDto.explanationSummary &&
         createTestCaseDto.explanationDetails
@@ -100,12 +94,10 @@ export class TestcasesService {
           data: {
             summary: createTestCaseDto.explanationSummary,
             details: createTestCaseDto.explanationDetails,
-            testCaseId: testCase.id, // Relacionamos la explicación con el TestCase recién creado
+            testCaseId: testCase.id, 
           },
         });
       }
-
-      // Devuelve el TestCase creado (incluyendo la posible Explanation asociada)
       return {
         ...testCase,
         explanation: createTestCaseDto.explanationSummary
@@ -118,16 +110,13 @@ export class TestcasesService {
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === 'P2002') {
-          // Conflicto de clave única (ej., si el nombre del TestCase ya existe)
           throw new ConflictException(
             `Test Case with name ${createTestCaseDto.name} already exists`,
           );
         }
       }
-
-      // En caso de cualquier otro error, lanzamos una excepción genérica
       throw new InternalServerErrorException(
-        'An error occurred while creating the TestCase',
+        'Ocurrió un error mientras se creaba el caso de Prueba Funcional',
       );
     }
   }
@@ -144,7 +133,7 @@ export class TestcasesService {
       });
       return testCases;
     } catch (error) {
-      throw new Error("Could not fetch user projects");
+      throw new Error("No se han podido recuperar los casos de prueba funcionales");
     }
     
   }
@@ -154,7 +143,7 @@ export class TestcasesService {
       where: { id: id },
     });
     if (!testCaseFound) {
-      throw new NotFoundException(`Test Case with id ${id} not found`);
+      throw new NotFoundException(`Caso de Prueba Funcional no encontrado`);
     }
 
     return testCaseFound;
@@ -176,14 +165,14 @@ export class TestcasesService {
       });
 
       if (!testCaseUpdate) {
-        throw new NotFoundException(`TestCase with id ${id} not found`);
+        throw new NotFoundException(`Caso de Prueba Funcional no encontrado`);
       }
 
       return testCaseUpdate;
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === 'P2025') {
-          throw new NotFoundException(`TestCase with id ${id} not found`);
+          throw new NotFoundException(`Caso de Prueba Funcional no encontrado`);
         }
       }
       throw error;
@@ -196,7 +185,7 @@ export class TestcasesService {
     });
 
     if (!deletedTestCase) {
-      throw new NotFoundException(`TestCase with id ${id} not found`);
+      throw new NotFoundException(`Caso de Prueba Funcional no encontrado`);
     }
 
     return deletedTestCase;

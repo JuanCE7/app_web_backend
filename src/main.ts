@@ -8,8 +8,8 @@ async function bootstrap() {
   app.setGlobalPrefix('api')
 
   const config = new DocumentBuilder()
-    .setTitle('Project Test Case Use Case')
-    .setDescription('The project API description')
+    .setTitle('Test Case Craft App')
+    .setDescription('El proyecto es una API REST')
     .setVersion('1.0')
     .build();
   const document = SwaggerModule.createDocument(app, config);

@@ -1,4 +1,4 @@
-import { IsString, MinLength, IsArray, IsUUID, IsOptional, IsObject, IsInt } from 'class-validator';
+import { IsString, MinLength, IsUUID, IsOptional } from 'class-validator';
 export class CreateUseCaseDto {  
     @IsString()
     @MinLength(3)
