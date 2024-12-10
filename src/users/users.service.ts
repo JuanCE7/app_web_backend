@@ -107,8 +107,8 @@ export class UsersService {
     return { user };
   }
 
-  async updateProfileUser(id: string, updateUserDto: UpdateUserDto) {
-    const { firstName, lastName, email, password, role } = updateUserDto;
+  async updateUser(id: string, updateUserDto: UpdateUserDto) {
+    const { firstName, lastName, email, password, role, status } = updateUserDto;
 
     const userDataToUpdate: any = {};
     const entityDataToUpdate: any = {};
@@ -134,6 +134,7 @@ export class UsersService {
                 connect: { name: role },
               }
             : undefined,
+          status:  status
         },
         include: {
           entity: true,
@@ -165,47 +166,5 @@ export class UsersService {
       return null;
     }
     return user;
-  }
-
-  async updateUser(id: string, updateUserDto: UpdateUserDto) {
-    const { firstName, lastName, email, role, status } = updateUserDto;
-
-    try {
-      const userUpdate = await this.prisma.user.update({
-        where: { id },
-        data: {
-          email,
-          status,
-          entity: {
-            update: {
-              firstName,
-              lastName,
-            },
-          },
-          role: role
-            ? {
-                connect: { name: role },
-              }
-            : undefined,
-        },
-        include: {
-          entity: true,
-          role: true,
-        },
-      });
-
-      if (!userUpdate) {
-        throw new NotFoundException(`User with id ${id} not found`);
-      }
-
-      return userUpdate;
-    } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        if (error.code === 'P2025') {
-          throw new NotFoundException(`User with id ${id} not found`);
-        }
-      }
-      throw error;
-    }
   }
 }

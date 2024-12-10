@@ -13,7 +13,6 @@ describe('UsersController', () => {
     createUser: jest.fn(),
     getUsers: jest.fn(),
     getUserById: jest.fn(),
-    updateProfileUser: jest.fn(),
     updateUser: jest.fn(),
   };
 
@@ -138,11 +137,11 @@ describe('UsersController', () => {
         role: { name: updateUserDto.role },
       };
 
-      mockUsersService.updateProfileUser.mockResolvedValue(updatedUser);
+      mockUsersService.updateUser.mockResolvedValue(updatedUser);
 
       const result = await usersController.update('1', updateUserDto);
       expect(result).toEqual(updatedUser);
-      expect(usersService.updateProfileUser).toHaveBeenCalledWith(
+      expect(usersService.updateUser).toHaveBeenCalledWith(
         '1',
         updateUserDto,
       );
