@@ -36,7 +36,7 @@ describe('UsecasesController', () => {
   });
 
   describe('create', () => {
-    it('should create a usecase', async () => {
+    it('Debe crear un caso de uso', async () => {
       const createUseCaseDto: CreateUseCaseDto = {
         code: '123',
         name: 'New Usecase',
@@ -54,7 +54,7 @@ describe('UsecasesController', () => {
   });
 
   describe('findAll', () => {
-    it('should return all usecases for a project', async () => {
+    it('Debe devolver todos los casos de uso de un proyecto', async () => {
       const projectId = '1';
       const result = await usecasesController.findAll(projectId);
       expect(result).toEqual([{ usecaseId: '1', projectId }]);
@@ -63,7 +63,7 @@ describe('UsecasesController', () => {
   });
 
   describe('findOne', () => {
-    it('should return a single usecase', async () => {
+    it('Debe devolver un caso de uso', async () => {
       const id = '1';
       const result = await usecasesController.findOne(id);
       expect(result).toEqual({ usecaseId: id, name: 'Test Usecase' });
@@ -72,7 +72,7 @@ describe('UsecasesController', () => {
   });
 
   describe('update', () => {
-    it('should update a usecase', async () => {
+    it('Debe actualizar un caso de uso', async () => {
       const id = '1';
       const updateUseCaseDto: UpdateUseCaseDto = { name: 'Updated Usecase' };
       const result = await usecasesController.update(id, updateUseCaseDto);
@@ -82,7 +82,7 @@ describe('UsecasesController', () => {
   });
 
   describe('remove', () => {
-    it('should remove a usecase', async () => {
+    it('Debe eliminar un caso de uso', async () => {
       const id = '1';
       const result = await usecasesController.remove(id);
       expect(result).toEqual({ usecaseId: id, removed: true });

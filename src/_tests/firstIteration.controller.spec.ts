@@ -46,7 +46,7 @@ describe('AuthController', () => {
   });
 
   describe('register', () => {
-    it('should register a user', async () => {
+    it('Debe registrar un usuario', async () => {
       const registerDto: RegisterUserDto = {
         firstName: 'test',
         lastName: 'test',
@@ -60,7 +60,7 @@ describe('AuthController', () => {
   });
 
   describe('verifyOtp', () => {
-    it('should verify OTP', async () => {
+    it('Debe verificar el OTP', async () => {
       const verifyOtpDto: VerifyOtpDto = {
         token: 'tasfasfe124198yuw9d1n2d1',
         enteredOtp: '123456',
@@ -72,7 +72,7 @@ describe('AuthController', () => {
   });
 
   describe('passwordRecovery', () => {
-    it('should send password recovery email', async () => {
+    it('Debe enviar correo electrónico de recuperación de contraseña', async () => {
       const email = 'test@example.com';
       const result = await authController.passwordRecovery(email);
       expect(result).toEqual({ email, status: 'email sent' });
@@ -81,14 +81,14 @@ describe('AuthController', () => {
   });
 
   describe('login', () => {
-    it('should return an access token', async () => {
+    it('Debe devolver un token de acceso', async () => {
       const loginDto: LoginDto = { email: '@example.com', password: '12345' };
       const result = await authController.login(loginDto);
       expect(result).toEqual({ accessToken: 'fake-jwt-token' });
       expect(authService.login).toHaveBeenCalledWith(loginDto);
     });
 
-    it('should throw an error for incorrect credentials', async () => {
+    it('Debe lanzar un error por credenciales incorrectas', async () => {
       const loginDto: LoginDto = {
         email: 'incorrect@example.com',
         password: 'wrongpassword',

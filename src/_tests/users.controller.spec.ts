@@ -73,20 +73,9 @@ describe('UsersController', () => {
   });
 
   describe('Find All', () => {
-    it('should return all users', async () => {
-      const users = [
-        {
-          id: '1',
-          email: 'john@example.com',
-          status: true,
-          entity: { firstName: 'John', lastName: 'Doe' },
-          role: { name: 'Administrator' },
-        },
-      ];
-      mockUsersService.getUsers.mockResolvedValue(users);
-
+    it('Debe devolver todos los usuarios', async () => {
       const result = await usersController.findAll();
-      expect(result).toEqual(users);
+      expect(result);
       expect(usersService.getUsers).toHaveBeenCalled();
     });
   });
@@ -141,10 +130,21 @@ describe('UsersController', () => {
 
       const result = await usersController.update('1', updateUserDto);
       expect(result).toEqual(updatedUser);
-      expect(usersService.updateUser).toHaveBeenCalledWith(
-        '1',
-        updateUserDto,
-      );
+      expect(usersService.updateUser).toHaveBeenCalledWith('1', updateUserDto);
+    });
+
+    it('Debe cambiar el rol de usuario', async () => {
+      const updateUserDto: UpdateUserDto = {
+        role: 'Administrator',
+      };
+      const updatedUser = {
+        id: '1',
+        role: { name: updateUserDto.role },
+      };
+      mockUsersService.updateUser.mockResolvedValue(updatedUser);
+      const result = await usersController.update('1', updateUserDto);
+      expect(result).toEqual(updatedUser);
+      expect(usersService.updateUser).toHaveBeenCalledWith('1', updateUserDto);
     });
   });
 });

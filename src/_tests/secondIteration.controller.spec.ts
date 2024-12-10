@@ -40,7 +40,7 @@ describe('ProjectsController', () => {
   });
 
   describe('create', () => {
-    it('should create a project', async () => {
+    it('Debe crear un proyecto', async () => {
       const createProjectDto: CreateProjectDto = {
         name: 'New Project',
         description: 'Project description',
@@ -53,7 +53,7 @@ describe('ProjectsController', () => {
   });
 
   describe('shareProject', () => {
-    it('should share a project', async () => {
+    it('Debe compartir un proyecto', async () => {
       const shareProjectDto: ShareProjectDto = { code: '1', userId: '2' };
       const result = await projectsController.shareProject(shareProjectDto);
       expect(result).toEqual({ ...shareProjectDto, shared: true });
@@ -73,7 +73,7 @@ describe('ProjectsController', () => {
   });
 
   describe('findAll', () => {
-    it('should return all projects for a user', async () => {
+    it('Debe devolver todos los proyectos de un usuario', async () => {
       const userId = '2';
       const result = await projectsController.findAll(userId);
       expect(result).toEqual([{ projectId: '1', userId }]);
@@ -91,7 +91,7 @@ describe('ProjectsController', () => {
   });
 
   describe('update', () => {
-    it('should update a project', async () => {
+    it('Debe actualizar un proyecto', async () => {
       const id = '1';
       const updateProjectDto: UpdateProjectDto = { name: 'Updated Project' };
       const result = await projectsController.update(id, updateProjectDto);
@@ -101,7 +101,7 @@ describe('ProjectsController', () => {
   });
 
   describe('remove', () => {
-    it('should remove a project', async () => {
+    it('Debe eliminar un proyecto', async () => {
       const id = '1';
       const result = await projectsController.remove(id);
       expect(result).toEqual({ projectId: id, removed: true });

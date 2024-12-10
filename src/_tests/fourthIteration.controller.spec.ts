@@ -37,7 +37,7 @@ describe('TestcasesController', () => {
   });
 
   describe('generate', () => {
-    it('should generate a testcase', async () => {
+    it('Debe generar casos de prueba funcionales', async () => {
       const id = '1';
       const result = await testcasesController.generate(id);
       expect(result).toEqual({ id, generated: true });
@@ -65,7 +65,7 @@ describe('TestcasesController', () => {
   });
 
   describe('findAll', () => {
-    it('should return all testcases for a use case', async () => {
+    it('Debe devolver todos los casos de prueba funcionales de un caso de uso', async () => {
       const useCaseId = '1';
       const result = await testcasesController.findAll(useCaseId);
       expect(result).toEqual([{ testCaseId: '1', useCaseId }]);
@@ -83,7 +83,7 @@ describe('TestcasesController', () => {
   });
 
   describe('update', () => {
-    it('should update a testcase', async () => {
+    it('Debe actualizar un caso de prueba funcional', async () => {
       const id = '1';
       const updateTestCaseDto: UpdateTestCaseDto = {
         name: 'Updated Test Case',
@@ -98,7 +98,7 @@ describe('TestcasesController', () => {
   });
 
   describe('remove', () => {
-    it('should remove a testcase', async () => {
+    it('Debe eliminar un caso de prueba funcional', async () => {
       const id = '1';
       const result = await testcasesController.remove(id);
       expect(result).toEqual({ testCaseId: id, removed: true });
