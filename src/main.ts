@@ -24,7 +24,7 @@ async function bootstrap() {
   );
 
   const cors ={
-    origin: ['http://localhost:4000','http://localhost:3000'],
+    origin: ['https://app-web-frontend.vercel.app'],
     methods: 'GET, HEAD,PUT,PATCH,POST,DELETE,OPTIONS'
   }
 
