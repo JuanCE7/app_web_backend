@@ -29,7 +29,7 @@ async function bootstrap() {
   }
 
   app.enableCors(cors);
-  const port = process.env.PORT|| 4000
+  const port = parseInt(process.env.PORT, 10)|| 4000
   await app.listen(port);
 }
 bootstrap();
