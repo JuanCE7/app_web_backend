@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { Usecase } from 'src/usecases/entities/usecase.entity';
 import { prompt, api_key } from '../utils/constants';
 import { CohereClient } from "cohere-ai";
-import { Project } from '@prisma/client';
 
 const cohere = new CohereClient({
   token: api_key,
@@ -10,11 +9,10 @@ const cohere = new CohereClient({
 @Injectable()
 export class IaService {
 
-  async getCompletion(useCaseData: Partial<Usecase>, projectData: Partial<Project>) {
+  async getCompletion(useCaseData: Partial<Usecase>) {
 
     const useCaseJson = JSON.stringify(useCaseData, null, 2);
-    const contextProject = projectData.description;
-    const promptData = ` ${prompt} \n${useCaseJson} \n "Contexto del Proyecto:" ${contextProject}`;
+    const promptData = ` ${prompt} \n${useCaseJson}`;
 
     try {
       const response = await cohere.v2.chat({
