@@ -10,17 +10,21 @@ import { PrismaService } from '../prisma/prisma.service';
 import { Prisma } from '@prisma/client';
 import { UsecasesService } from '../usecases/usecases.service';
 import { IaService } from '../ia/ia.service';
+import { ProjectsService } from 'src/projects/projects.service';
 @Injectable()
 export class TestcasesService {
   constructor(
     private prismaService: PrismaService,
     private readonly usecasesService: UsecasesService,
+    private readonly projectService: ProjectsService,
     private readonly iaService: IaService,
   ) {}
 
   async generateTestCase(id: string) {
     try {
       const useCase = await this.usecasesService.findOne(id);
+      const project = await this.projectService.findOne(useCase.projectId)
+
       if (!useCase) {
         throw new NotFoundException(`Caso de Uso no encontrado`);
       }
@@ -37,7 +41,7 @@ export class TestcasesService {
         }
       };
 
-      const generatedTestCaseText = await this.iaService.getCompletion(useCase);
+      const generatedTestCaseText = await this.iaService.getCompletion(useCase, project);
       const generatedTestCase2 = cleanResponse(generatedTestCaseText);
 
       const generatedTestCase = JSON.parse(generatedTestCase2);
