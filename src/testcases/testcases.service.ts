@@ -128,9 +128,6 @@ export class TestcasesService {
         where: {
           useCaseId: useCaseId,
         },
-        orderBy: {
-          createdAt: 'desc',
-        },
       });
       return testCases;
     } catch (error) {

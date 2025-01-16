@@ -50,9 +50,6 @@ export class UsecasesService {
       where: {
         projectId: projectId,
       },
-      orderBy: {
-        createdAt: 'desc',
-      },
     });
   }
 
