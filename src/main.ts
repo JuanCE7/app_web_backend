@@ -24,7 +24,7 @@ async function bootstrap() {
   );
 
   const cors ={
-    origin: ['https://testcasecraftunl.vercel.app'],
+    origin: '*',
     methods: 'GET, HEAD,PUT,PATCH,POST,DELETE,OPTIONS'
   }
 

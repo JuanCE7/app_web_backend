@@ -122,7 +122,7 @@ export class AuthService {
 
     await this.sendEmail(
       email,
-      'Recuperación de contraseña en CaseCraft',
+      'Recuperación de contraseña en TestCaseCraft',
       htmlContent,
     );
 

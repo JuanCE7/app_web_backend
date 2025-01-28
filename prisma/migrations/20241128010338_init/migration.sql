@@ -142,3 +142,25 @@ ALTER TABLE "TestCase" ADD CONSTRAINT "TestCase_useCaseId_fkey" FOREIGN KEY ("us
 
 -- AddForeignKey
 ALTER TABLE "Explanation" ADD CONSTRAINT "Explanation_testCaseId_fkey" FOREIGN KEY ("testCaseId") REFERENCES "TestCase"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+
+-- prisma/migrations/YYYYMMDDHHMMSS_add_initial_roles/migration.sql
+INSERT INTO "Role"("id", "name") VALUES ('1', 'Administrator');
+INSERT INTO "Role"("id", "name") VALUES ('2', 'Tester');
+
+-- Insert Admin Entity
+INSERT INTO "Entity"("id", "firstName", "lastName") 
+VALUES ('100', 'Admin', 'User');
+
+-- Insert Admin User
+INSERT INTO "User"("id", "email", "password", "status", "entityId", "roleId", "createdAt", "updatedAt") 
+VALUES (
+    '100', 
+    'admin@unl.edu.ec', 
+    '$2a$10$EA6OOzy3n82mtvafCYyvceUjjvCWD.x/N3oB9xXAub2Wpr4EIvOdi',
+    true, 
+    '100', 
+    '1', 
+    CURRENT_TIMESTAMP, 
+    CURRENT_TIMESTAMP
+);
