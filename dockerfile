@@ -4,11 +4,11 @@ FROM node:20.11.1 AS builder
 # Establecer directorio de trabajo
 WORKDIR /app
 
-# Copiar archivos necesarios para instalar dependencias
+# Copiar solo los archivos necesarios (package.json y package-lock.json si existe)
 COPY package*.json ./
 
-# Instalar dependencias, incluyendo @nestjs/cli como dependencia de desarrollo
-RUN npm install --include=dev
+# Copiar node_modules desde tu máquina local (suponiendo que ya están presentes)
+COPY node_modules ./node_modules
 
 # Copiar archivos del proyecto y construir la aplicación
 COPY . ./
