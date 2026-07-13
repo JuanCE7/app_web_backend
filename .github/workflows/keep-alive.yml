@@ -1,0 +1,46 @@
+name: keep-alive
+
+# Mantiene despierto el backend (Render free se duerme tras ~15 min de
+# inactividad). Hace ping al endpoint de salud, que además "toca" la BD para
+# evitar que se pause por inactividad.
+#
+# Configuración requerida:
+#   Settings → Secrets and variables → Actions → New repository secret
+#     HEALTH_URL = https://TU-BACKEND.onrender.com/api/health/db
+#   (si no se define el secret, se usa el placeholder de abajo — reemplázalo).
+
+on:
+  schedule:
+    # Cada 10 minutos (margen frente al sleep de ~15 min de Render).
+    # Nota: el scheduler de GitHub Actions puede tener retrasos de algunos
+    # minutos; para SLA estricto complementar con UptimeRobot/cron-job.org.
+    - cron: "*/10 * * * *"
+  workflow_dispatch: {} # permite ejecutarlo manualmente desde la pestaña Actions
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping health endpoint
+        run: |
+          URL="${{ secrets.HEALTH_URL }}"
+          if [ -z "$URL" ]; then
+            URL="https://testcasecraft-backend.onrender.com/api/health/db"
+            echo "⚠️  Secret HEALTH_URL no configurado; usando placeholder: $URL"
+          fi
+          echo "Pinging $URL"
+          code=$(curl -s -o /tmp/body -w "%{http_code}" --max-time 90 "$URL" || echo "000")
+          echo "HTTP $code"
+          cat /tmp/body || true
+          # Un cold start puede devolver 502 mientras arranca; reintentamos una vez.
+          if [ "$code" != "200" ]; then
+            echo "Reintentando en 30s (posible cold start)…"
+            sleep 30
+            code=$(curl -s -o /tmp/body -w "%{http_code}" --max-time 90 "$URL" || echo "000")
+            echo "HTTP $code"
+            cat /tmp/body || true
+          fi
+          if [ "$code" != "200" ]; then
+            echo "::error::El backend no respondió 200 (código $code)"
+            exit 1
+          fi

@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { IaModule } from './ia/ia.module';
 import { ExplanationModule } from './explanation/explanation.module';
+import { HealthModule } from './health/health.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { ExplanationModule } from './explanation/explanation.module';
     UsersModule,
     IaModule,
     ExplanationModule,
+    HealthModule,
   ],
   controllers: [],
   providers: [PrismaService],
