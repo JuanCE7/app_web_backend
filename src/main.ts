@@ -42,6 +42,9 @@ async function bootstrap() {
   app.enableCors(cors);
   // Render (y la mayoría de PaaS) inyecta el puerto vía la variable PORT.
   const port = process.env.PORT ?? 4000;
-  await app.listen(port);
+  // Enlazamos explícitamente a 0.0.0.0: sin host, Node puede escuchar solo en
+  // IPv6 (::) y Render (que escanea 0.0.0.0/IPv4) no detecta el puerto →
+  // "No open ports detected". Con 0.0.0.0 queda accesible en todas las interfaces.
+  await app.listen(port, '0.0.0.0');
 }
 bootstrap();
