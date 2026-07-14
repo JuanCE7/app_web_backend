@@ -14,6 +14,8 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { transporter } from '../utils/mailer';
 import { VerifyOtpDto } from './dto/verifyOtp.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
+import { jwtSecret } from '../utils/constants';
 
 @Injectable()
 export class AuthService {
@@ -32,7 +34,9 @@ export class AuthService {
     return this.revokedTokens.has(token);
   }
 
-  async logout(token: string) {
+  async logout(authHeader: string) {
+    // El controlador entrega el header completo ("Bearer xxx"); guardamos solo el token.
+    const token = authHeader?.replace(/^Bearer\s+/i, '') ?? authHeader;
     this.revokeToken(token);
     return { message: 'Sesión Cerrada correctamente' };
   }
@@ -52,11 +56,11 @@ export class AuthService {
       role: Roles.Tester,
     });
 
+    // No devolvemos la contraseña (ni siquiera el hash) en la respuesta.
     return {
       firstName,
       lastName,
       email,
-      password,
       status: true,
       role: Roles.Tester,
     };
@@ -131,18 +135,13 @@ export class AuthService {
 
   async verifyOtp({ token, enteredOtp }: VerifyOtpDto) {
     try {
-      const decoded = this.jwtService.decode(token) as {
+      // verifyAsync valida la FIRMA y la expiración del token (antes se usaba
+      // decode, que no verifica firma: cualquiera podía forjar un token OTP).
+      const decoded = await this.jwtService.verifyAsync<{
         email: string;
         otp: string;
-        exp: number;
-      };
-      if (!decoded) {
-        throw new UnauthorizedException('Token inválido');
-      }
-      const currentTimestamp = Math.floor(Date.now() / 1000);
-      if (decoded.exp && decoded.exp < currentTimestamp) {
-        throw new UnauthorizedException('El código OTP ha expirado');
-      }
+      }>(token, { secret: jwtSecret });
+
       if (decoded.otp !== enteredOtp) {
         throw new UnauthorizedException('Código OTP inválido');
       }
@@ -155,8 +154,33 @@ export class AuthService {
       if (error instanceof UnauthorizedException) {
         throw error;
       }
-      throw new UnauthorizedException('Error al procesar el código OTP');
+      // TokenExpiredError / JsonWebTokenError de la verificación de firma
+      throw new UnauthorizedException('Código OTP inválido o expirado');
     }
+  }
+
+  async resetPassword({ token, newPassword }: ResetPasswordDto) {
+    let email: string;
+    try {
+      // Autorizado por el token OTP firmado (mismo que valida verifyOtp).
+      const decoded = await this.jwtService.verifyAsync<{ email: string }>(
+        token,
+        { secret: jwtSecret },
+      );
+      email = decoded.email;
+    } catch {
+      throw new UnauthorizedException(
+        'El enlace de recuperación es inválido o expiró.',
+      );
+    }
+
+    const user = await this.usersService.findByEmail(email);
+    if (!user) {
+      throw new UnauthorizedException('Usuario no encontrado.');
+    }
+
+    await this.usersService.updateUser(user.id, { password: newPassword });
+    return { success: true, message: 'Contraseña actualizada correctamente' };
   }
 
   private async validateUser(email: string, password: string) {
@@ -172,14 +196,25 @@ export class AuthService {
       throw new UnauthorizedException('Contraseña incorrecta');
     }
 
+    // El check de cuenta desactivada vive ahora en el backend (antes solo lo
+    // hacía el frontend, que ya no puede consultar /users sin autenticación).
+    if (!user.status) {
+      throw new UnauthorizedException('CUENTA_DESACTIVADA');
+    }
+
     return user;
   }
 
   async login({ email, password }: LoginDto) {
     try {
       const user = await this.validateUser(email, password);
-      const payload = { email: user.email, role: user.role };
-      const token = await this.jwtService.signAsync(payload);
+      // El payload guarda el nombre del rol (string), no el objeto Role, para
+      // que RolesGuard pueda comparar contra el enum. Expiry 1d: cómodamente
+      // mayor que la sesión de NextAuth (1h) para evitar 401 a mitad de sesión.
+      const payload = { email: user.email, role: user.role.name };
+      const token = await this.jwtService.signAsync(payload, {
+        expiresIn: '1d',
+      });
 
       return {
         token,
@@ -188,6 +223,11 @@ export class AuthService {
       };
     } catch (error) {
       if (error instanceof UnauthorizedException) {
+        if (error.message === 'CUENTA_DESACTIVADA') {
+          throw new UnauthorizedException(
+            'Tu cuenta ha sido desactivada. Contacta con soporte.',
+          );
+        }
         throw new UnauthorizedException('Correo o contraseña incorrectos.');
       }
       throw new InternalServerErrorException('Error al procesar la solicitud.');

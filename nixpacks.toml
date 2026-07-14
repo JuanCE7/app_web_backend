@@ -1,5 +1,6 @@
 [phases.setup]
-nixPkgs = ["nodejs-18_x"]
+# Unificado con el Dockerfile (Node 20) para evitar divergencias entre builders.
+nixPkgs = ["nodejs_20"]
 
 [phases.build]
 cmds = ["npm install", "npm run build"]

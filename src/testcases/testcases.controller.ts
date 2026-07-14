@@ -1,10 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { TestcasesService } from './testcases.service';
 import { UpdateTestCaseDto } from './dto/update-testcase.dto';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateTestCaseDto } from './dto/create-testcase.dto';
+import { AuthGuard } from '../auth/guard/auth.guard';
 
 @ApiTags('testcases')
+@ApiBearerAuth()
+@UseGuards(AuthGuard)
 @Controller('testcases')
 export class TestcasesController {
   constructor(private readonly testcasesService: TestcasesService) {}

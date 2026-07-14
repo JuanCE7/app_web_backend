@@ -5,6 +5,7 @@ import { Request } from 'express';
 import { Auth } from './decorators/auth.decorator';
 import { RegisterUserDto } from './dto/register.dto';
 import { VerifyOtpDto } from './dto/verifyOtp.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 
 interface RequestWithUser extends Request {
   user: { email: string; role: string };
@@ -28,6 +29,14 @@ export class AuthController {
     verifyOtpDto: VerifyOtpDto,
   ) {
     return this.authService.verifyOtp(verifyOtpDto);
+  }
+
+  @Post('resetPassword')
+  resetPassword(
+    @Body()
+    resetPasswordDto: ResetPasswordDto,
+  ) {
+    return this.authService.resetPassword(resetPasswordDto);
   }
 
   @Get('/passwordRecovery/:email')

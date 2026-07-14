@@ -1,10 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { UsecasesService } from './usecases.service';
 import { CreateUseCaseDto } from './dto/create-usecase.dto';
 import { UpdateUseCaseDto } from './dto/update-usecase.dto';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { AuthGuard } from '../auth/guard/auth.guard';
 
 @ApiTags('usecases')
+@ApiBearerAuth()
+@UseGuards(AuthGuard)
 @Controller('usecases')
 export class UsecasesController {
   constructor(private readonly usecasesService: UsecasesService) {}

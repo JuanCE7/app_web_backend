@@ -1,8 +1,11 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, UseGuards } from '@nestjs/common';
 import { ExplanationService } from './explanation.service';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { AuthGuard } from '../auth/guard/auth.guard';
 
 @ApiTags('explanation')
+@ApiBearerAuth()
+@UseGuards(AuthGuard)
 @Controller('explanation')
 export class ExplanationController {
   constructor(private readonly explanationService: ExplanationService) {}
