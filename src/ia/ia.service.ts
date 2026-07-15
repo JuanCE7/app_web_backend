@@ -22,9 +22,14 @@ export class IaService {
     const useCaseJson = JSON.stringify(useCaseData, null, 2);
     const promptData = ` ${prompt} \n${useCaseJson}`;
 
+    // Modelo configurable por env: Cohere retira modelos periódicamente (p.ej.
+    // 'command-r' fue eliminado el 15/09/2025). Con COHERE_MODEL puedes cambiarlo
+    // sin tocar código. Lista actual: https://docs.cohere.com/docs/models
+    const model = process.env.COHERE_MODEL || 'command-a-03-2025';
+
     try {
       const response = await cohere.v2.chat({
-        model: 'command-r',
+        model,
         messages: [
           {
             role: 'user',
